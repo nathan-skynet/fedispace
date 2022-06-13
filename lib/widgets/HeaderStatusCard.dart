@@ -101,6 +101,9 @@ class HeaderStatusCard extends StatelessWidget {
                                  borderRadius: BorderRadius.all(Radius.circular(10))),
                              onSelected: (int index) {
                                print('index is $index');
+                               if(index == 3){
+                                 apiService.muteUser(postsAccount.id);
+                               }
                              },
                              itemBuilder: (context) => [
                                const PopupMenuItem(
@@ -113,7 +116,7 @@ class HeaderStatusCard extends StatelessWidget {
                                ),
                                const PopupMenuItem(
                                  value: 3,
-                                 child: Text("Signaler"),
+                                 child: Text("Mute User"),
                                ),
                                const PopupMenuItem(
                                  value: 4,

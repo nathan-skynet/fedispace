@@ -95,6 +95,7 @@ class Status {
           attachement: List.castFrom<dynamic, dynamic>(data['media_attachments']),
           blurhash :  data["media_attachments"][0]["blurhash"] ?? "L5H2EC=PM+yV0g-mq.wG9c010J}I",
           reblogs_count : data["reblogs_count"] ?? "none" ,
+
       );
 
      Map<String, dynamic> toJson() => {
@@ -121,5 +122,6 @@ class Status {
            "replies_count" : replies_count,
            "attachement" : attachement,
            "reblogs_count" :  reblogs_count,
+
   };
 }
