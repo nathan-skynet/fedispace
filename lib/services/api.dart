@@ -220,20 +220,34 @@ class ApiService {
     setHelper();
   }
 
-  Future<bool> NodeInfo() async{
-    String apiUrl;
-    apiUrl = "${instanceUrl!}/api/nodeinfo/2.0.json";
-    http.Response resp =  await _apiGet(apiUrl);
+  Future<bool> NodeInfo(domain) async{
+    try{
+      String apiUrl;
+      print(domain);
+      if (domain.toString().contains("://")) {
+        apiUrl = "${domain}/api/v1/instance";
+      } else {
+        apiUrl  = "https://${domain.toString()}/api/v1/instance";
 
-    if (resp.statusCode == 200) {
-      if(jsonDecode(resp.body)[0]["metadata"]["nodeName"] == "Pixelfed" && jsonDecode(resp.body)[0]["config"]["features"]["mobile_apis"] == true){
-        return true;
       }
+      print(apiUrl);
+      http.Response resp = await http.get(Uri.parse(apiUrl));
+      print(jsonDecode(resp.body));
+      if (resp.statusCode == 200) {
+        print(jsonDecode(resp.body));
+        if(jsonDecode(resp.body)[0]["metadata"]["nodeName"] == "Pixelfed" && jsonDecode(resp.body)[0]["config"]["features"]["mobile_apis"] == true){
+          print("ok");
+          return true;
+        }
+        print("pas ok");
+        return false;
+      }
+    }
+    catch(e){
+      print("pas ok");
       return false;
     }
-    throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getStatusList`",
-    );
+    return false;
   }
 
   Future<String> GetRepliesBy(String id) async{
