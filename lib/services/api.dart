@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:oauth2_client/access_token_response.dart';
@@ -429,6 +430,51 @@ class ApiService {
 
   }
 
+  Future<bool> muteUser(userId) async {
+    final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/mute";
+    http.Response resp = await _apiPost(apiUrl);
+    if (resp.statusCode == 200) {
+      Fluttertoast.showToast(
+          msg: "You have muted user",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          // backgroundColor: Colors.red,
+          // textColor: Colors.white,
+          fontSize: 16.0);
+      return true;
+    }
+    throw ApiException(
+      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+    );
+  }
+
+
+  Future<bool> unmuteUser(userId) async {
+    final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/unmute";
+    http.Response resp = await _apiPost(apiUrl);
+    if (resp.statusCode == 200) {
+      Fluttertoast.showToast(
+          msg: "You have unmuted user",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          // backgroundColor: Colors.red,
+          // textColor: Colors.white,
+          fontSize: 16.0);
+      return true;
+    }
+    throw ApiException(
+      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+    );
+  }
+
+
+
+
+
+
+
   /// Revokes all API service credentials & state variables from the
   /// device's secure storage, and sets their values as `null` in the
   /// instance.
@@ -444,3 +490,4 @@ class ApiService {
     helper = null;
   }
 }
+
