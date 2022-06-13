@@ -25,11 +25,6 @@ const String isolateName = 'isolate';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    cameras = await availableCameras();
-  } on CameraException catch (e) {
-    debugPrint('Error in fetching the cameras: $e');
-  }
   runApp(MyApp());
 }
 
