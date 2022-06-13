@@ -469,7 +469,43 @@ class ApiService {
     );
   }
 
+  Future<bool> blockUser(userId) async {
+    final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/block";
+    http.Response resp = await _apiPost(apiUrl);
+    if (resp.statusCode == 200) {
+      Fluttertoast.showToast(
+          msg: "You have blocked user",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          // backgroundColor: Colors.red,
+          // textColor: Colors.white,
+          fontSize: 16.0);
+      return true;
+    }
+    throw ApiException(
+      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+    );
+  }
 
+  Future<bool> unblockUser(userId) async {
+    final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/unblock";
+    http.Response resp = await _apiPost(apiUrl);
+    if (resp.statusCode == 200) {
+      Fluttertoast.showToast(
+          msg: "You have unblocked user",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          // backgroundColor: Colors.red,
+          // textColor: Colors.white,
+          fontSize: 16.0);
+      return true;
+    }
+    throw ApiException(
+      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+    );
+  }
 
 
 

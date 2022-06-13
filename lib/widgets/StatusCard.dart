@@ -163,7 +163,6 @@ class _StatusCardState extends State<StatusCard> {
   Widget build(BuildContext context) {
     // TODO: display more information on each status
     // TODO: main text color (Colors.white) should change depending on theme
-    print(status.muted);
     if (status.sensitive != true && status.muted != true) {
       return Container(
         width: MediaQuery.of(context).size.width - 0,
