@@ -325,7 +325,6 @@ class ApiService {
 
 
   Future<AccountUsers> getUserAccount(id) async {
-
       final apiUrl = "${instanceUrl!}/api/v1/accounts/${id}";
       http.Response resp = await _apiGet(apiUrl);
       if (resp.statusCode == 200) {
@@ -337,7 +336,6 @@ class ApiService {
       throw ApiException(
         "Unexpected status code ${resp.statusCode} on `getAccount`",
       );
-
   }
 
   Future<Status> statusByID(String statusId) async {
@@ -429,9 +427,8 @@ class ApiService {
   /// Performs an authenticated query to the API in order to force the log-in
   /// view. In the process, sets the `this.currentAccount` instance attribute.
   ///
+  ///
   Future<Account> logIn() async {
-    // If the user is not authenticated, `helper` will automatically
-    // request for authentication while calling this method
     return await getAccount();
   }
 
@@ -560,7 +557,6 @@ class ApiService {
       "Unexpected status code ${resp.statusCode} on `getStatusList`",
     );
   }
-
 
 
 
