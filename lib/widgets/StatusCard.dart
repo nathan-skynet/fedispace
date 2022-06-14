@@ -170,7 +170,7 @@ class _StatusCardState extends State<StatusCard> {
         padding: const EdgeInsets.all(0.0),
         child: Card(
           elevation: 10,
-          color: Colors.grey.shade700,
+          color: Colors.black45,
           shape: const RoundedRectangleBorder(
             side: BorderSide(color: Colors.black54, width: 1),
             borderRadius: BorderRadius.all(Radius.circular(15)),
