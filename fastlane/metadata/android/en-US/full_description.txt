@@ -1,0 +1,18 @@
+Fedispace is an application under development written with Flutter.
+         It allows to connect to the Pixelfed federation.
+
+         It lacks a lot of functionality but is being integrated. It uses push notifications without Google, i.e. UnifiedPush and (Gotify, NTFY).
+
+         For everything that is question of graphic style I am open to any suggestions at  [https://git.echelon4.space/sk7n4k3d/fedispace/issues].
+
+         Features:
+
+         * <b> Dark mode </b> - because we can.
+         * <b> No dependency on Google </b> - Firebase
+         * <b> Ready for Push Notification with UnifiedPush backend </b> - Send notification with (NTFY, Gotify, Nextpush)
+         * <b> beautiful UI Timeline under dev </b>
+         * <b> No leak data your data is your data </b> EXIF information removed
+         * <b> Active development </b>
+         * <b> By the community for the community </b>
+         * <b> No tracker </b>
+
