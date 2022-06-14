@@ -24,10 +24,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreen extends State<HomeScreen> {
   Account? account;
 
-
   @override
   void initState() {
-    //checkAuthStatus();
     super.initState();
   }
 

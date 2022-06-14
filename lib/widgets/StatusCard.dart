@@ -154,7 +154,7 @@ class _StatusCardState extends State<StatusCard> {
       return;
     }
   }
-
+/// TODO change Share with SharePlus
   final FlutterShareMe flutterShareMe = FlutterShareMe();
 
   late Uint8List imageDataBytes;
@@ -163,6 +163,7 @@ class _StatusCardState extends State<StatusCard> {
   Widget build(BuildContext context) {
     // TODO: display more information on each status
     // TODO: main text color (Colors.white) should change depending on theme
+
     if (status.sensitive != true && status.muted != true) {
       return Container(
         width: MediaQuery.of(context).size.width - 0,

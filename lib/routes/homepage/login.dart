@@ -30,8 +30,8 @@ class _Login extends State<Login> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 2,
-        // backgroundColor: Colors.red,
-        // textColor: Colors.white,
+         backgroundColor: Colors.green,
+         textColor: Colors.black,
         fontSize: 16.0);
     Navigator.pushNamedAndRemoveUntil(context, '/TimeLine', (route) => false);
   }

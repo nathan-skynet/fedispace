@@ -1,5 +1,4 @@
 // ignore_for_file: non_constant_identifier_names, avoid_print
-import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -8,10 +7,7 @@ import 'package:fedispace/services/api.dart';
 import 'package:fedispace/data/account.dart';
 import 'package:fedispace/data/status.dart';
 import 'package:fedispace/widgets/StatusCard.dart';
-
 import '../widgets/bottomWidget.dart';
-import '../widgets/header.dart';
-import '../widgets/story_widget.dart';
 import 'navbar.dart';
 
 
@@ -111,11 +107,26 @@ class _TimelineTabsState extends State<Timeline> with TickerProviderStateMixin{
     return
         WillPopScope(
           onWillPop: _onWillPop,
-          child: Scaffold(
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    colors: [
+                      Colors.lightBlue,
+                      Colors.red.shade900,
+                      Colors.blue.shade800,
+                    ],
+                  )),
+            child: Scaffold(
+                backgroundColor: Colors.transparent,
               drawer: NavBar(apiService: widget.apiService ),
              // appBar: HeaderWidget(apiService: widget.apiService),
               extendBody: true,
               body: RefreshIndicator(
+                  backgroundColor: Colors.yellowAccent,
                 onRefresh: () => Future.sync(_pagingController.refresh),
                 child: PagedListView<String?, Status>(
                   pagingController: _pagingController,
@@ -132,7 +143,7 @@ class _TimelineTabsState extends State<Timeline> with TickerProviderStateMixin{
 
               //Init Floating Action Bubble
               bottomNavigationBar: widget.typeTimeLine == 'home' ?  bottomWidget(apiService: widget.apiService,page: 0) : bottomWidget(apiService: widget.apiService,page: 1)
-          ),
+          ))
         );
 }
 
