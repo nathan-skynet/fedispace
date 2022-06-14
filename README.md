@@ -23,8 +23,8 @@ One of the main feature is the push notification that I plan to implement.
 - [x] Like on doubleTap      
 - [x] Posts Photo
 - [ ] NSFW Posts ("Desactived")
-- [X] Add Posts Photo
-- [X] Add Posts Video
+- [ ] Add Posts Photo
+- [ ] Add Posts Video
 - [ ] Crop and more Story Only (Photo editor)
 - [x] Share Posts
 - [x] Like Posts

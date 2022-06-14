@@ -50,20 +50,22 @@ class ApiService {
 // TODO A VRAIMENT REVOIR !!!!!!!!
   Future<int>createPosts(String Token, String content, String in_reply_to_id, List media_ids,String sensitive,String spoiler_text, String visibility ) async {
     try {
-      Map<String, dynamic> result = jsonDecode("""{"status": "$content", "media_ids": $media_ids}""");
-      var response = await http.post(
-        Uri.parse("${instanceUrl!}/api/v1/statuses"),
-        body: jsonEncode(result),
+      var resultat = content.replaceAll("\n", '\\n');
+      
+      Map<String, dynamic> result = jsonDecode("""{"status": "$resultat", "media_ids": $media_ids}""");
+
+      var response = await http.post( Uri.parse("${instanceUrl!}/api/v1/statuses"), body: jsonEncode(result),
         headers: <String, String>{
           "Content-Type": "application/json",
           "Authorization": "Bearer $Token",
         },
     );
-      int test = response.statusCode ;
+
+      int resultCode = response.statusCode;
       print(result);
       print(response.statusCode.toString());
       print(response.body);
-      if(test == 200){
+      if(resultCode == 200){
         AwesomeNotifications().createNotification(
           content: NotificationContent(
               id: 1,
