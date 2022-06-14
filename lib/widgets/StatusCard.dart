@@ -154,6 +154,7 @@ class _StatusCardState extends State<StatusCard> {
       return;
     }
   }
+
 /// TODO change Share with SharePlus
   final FlutterShareMe flutterShareMe = FlutterShareMe();
 
@@ -362,9 +363,9 @@ class _StatusCardState extends State<StatusCard> {
                     } else if (snapshot.hasError) {}
                     return Container();
                   }),
-              const SizedBox(height: 5),
+               SizedBox(height: 5),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding:  EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -380,16 +381,11 @@ class _StatusCardState extends State<StatusCard> {
                         const SizedBox(width: 5),
                       ],
                     ),
-                    const SizedBox(height: 10),
-                    const Divider(),
-                    status.replies_count != 0
-                        ? Text(
-                            'See ${status.replies_count.toString()} comments',
-                            style: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey.shade400),
-                          )
-                        : Container(),
+                     SizedBox(height: 10),
+                     Divider(),
+                    //status.replies_count != 0
+                       // ? animatedContainerDemoScreenState("See ${status.replies_count.toString()} comments")
+                      //  : Container(),
                     Container(),
                     const SizedBox(height: 15),
                   ],
@@ -404,3 +400,36 @@ class _StatusCardState extends State<StatusCard> {
     }
   }
 }
+/*
+Column animatedContainerDemoScreenState  {
+
+  void _animateContainerSize() {
+    Random random = Random();
+    setState(() {
+      width = (random.nextInt(150) + 50).toDouble();
+      height = (random.nextInt(150) + 50).toDouble();
+      duration = 300;
+    });
+  }
+
+  int duration = 300;
+  double height = 20;
+
+  return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          AnimatedContainer(
+            duration: Duration(milliseconds: duration),
+            height: height,
+            curve: Curves.fastOutSlowIn,str
+            child: Text(
+              'See $text comments',
+              style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: Colors.grey.shade400),
+            ),
+          ),
+        ],
+      );
+}
+*/

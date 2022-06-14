@@ -63,6 +63,7 @@ dependencies:
   fluttertoast: ^8.0.9
   flutter_social_textfield: ^0.1.0
   flutter_launcher_icons: ^0.9.3
+  advstory: ^0.1.0
 
 
 flutter_icons:
