@@ -69,10 +69,10 @@ class MyApp extends StatelessWidget {
             Timeline(apiService: apiService, typeTimeLine: "public"),
         '/Camera': (context) => CameraScreen(apiService: apiService),
         '/Notification': (context) => Notif(apiService: apiService),
-        '/View': (context) => View(),
+        '/View': (context) => const View(),
         '/Desc': (context) => Desc(apiService: apiService),
         '/sendPosts': (context) => sendPosts(apiService: apiService),
-        '/presentation': (context) => presentation(),
+        '/presentation': (context) => const presentation(),
       },
     );
   }

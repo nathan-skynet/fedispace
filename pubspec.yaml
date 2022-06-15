@@ -66,6 +66,7 @@ dependencies:
   advstory: ^0.1.0
   dropdown_search: ^5.0.2
   intro_slider: ^3.0.7
+  image_editor_plus: ^0.1.3
 
 
 flutter_icons:
