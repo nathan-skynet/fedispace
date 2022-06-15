@@ -1,18 +1,21 @@
-import 'package:flutter/material.dart';
 import 'package:fedispace/routes/homepage/inputWidget.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:fedispace/services/api.dart';
 import 'package:fedispace/services/unifiedpush.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:oauth2_client/access_token_response.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Login extends StatefulWidget {
   /// Main instance of the API service to use in the widget.
   final ApiService apiService;
   final UnifiedPushService unifiedPushService;
+
   const Login(
       {Key? key, required this.apiService, required this.unifiedPushService})
       : super(key: key);
+
   @override
   State<Login> createState() => _Login();
 }
@@ -30,8 +33,8 @@ class _Login extends State<Login> {
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 2,
-         backgroundColor: Colors.green,
-         textColor: Colors.black,
+        backgroundColor: Colors.green,
+        textColor: Colors.black,
         fontSize: 16.0);
     Navigator.pushNamedAndRemoveUntil(context, '/TimeLine', (route) => false);
   }
@@ -45,8 +48,8 @@ class _Login extends State<Login> {
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 2,
-           backgroundColor: Colors.red,
-           textColor: Colors.black,
+          backgroundColor: Colors.red,
+          textColor: Colors.black,
           fontSize: 16.0);
     }
 
@@ -155,12 +158,24 @@ class _Login extends State<Login> {
               padding: EdgeInsets.only(bottom: 50),
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, '/presentation');
+              },
               child: roundedRectButton(
                   "What is Pixelfed", signInGradients, false, 0),
             ),
             GestureDetector(
-              onTap: () {},
+              onTap: () async {
+                Uri url = Uri.parse("https://pix.echelon4.space/register");
+                var urlLaunchable = await canLaunchUrl(
+                    url); //canLaunch is from url_launcher package
+                if (urlLaunchable) {
+                  await launchUrl(
+                      url); //launch is from url_launcher package to launch URL
+                } else {
+                  debugPrint("URL can't be launched.");
+                }
+              },
               child: roundedRectButton(
                   "Create an Account", signUpGradients, false, 0),
             )

@@ -65,6 +65,7 @@ dependencies:
   flutter_launcher_icons: ^0.9.3
   advstory: ^0.1.0
   dropdown_search: ^5.0.2
+  intro_slider: ^3.0.7
   
 
 flutter_icons:

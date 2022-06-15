@@ -2,10 +2,10 @@ import 'package:fedispace/services/api.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-
 class bottomWidget extends StatefulWidget {
   final ApiService apiService;
   int page;
+
   bottomWidget({Key? key, required this.apiService, required this.page})
       : super(key: key);
 
@@ -15,6 +15,7 @@ class bottomWidget extends StatefulWidget {
 
 class _bottomWidget extends State<bottomWidget> {
   late int _setIndex;
+
   void _getIndex(int pos) {
     switch (pos) {
       case 0:
@@ -26,6 +27,7 @@ class _bottomWidget extends State<bottomWidget> {
         break;
 
       case 2:
+        Navigator.pushNamed(context, '/sendPosts');
         break;
 
       case 3:
@@ -52,7 +54,7 @@ class _bottomWidget extends State<bottomWidget> {
   Widget build(BuildContext context) {
     _setIndex = widget.page;
     return Container(
-       clipBehavior: Clip.antiAlias,
+        clipBehavior: Clip.antiAlias,
         decoration: const BoxDecoration(
           borderRadius: BorderRadius.only(
               topRight: Radius.circular(40), topLeft: Radius.circular(40)),
@@ -76,15 +78,20 @@ class _bottomWidget extends State<bottomWidget> {
               onTap: (int index) {
                 _onItemTapped(index);
               },
-              items:   const [
-                 BottomNavigationBarItem(
-                icon : Icon(FontAwesomeIcons.house) , label: 'Home'),
+              items: const [
+                BottomNavigationBarItem(
+                    icon: Icon(FontAwesomeIcons.house), label: 'Home'),
                 BottomNavigationBarItem(
                     icon: Icon(FontAwesomeIcons.barsStaggered), label: 'Local'),
                 BottomNavigationBarItem(
-                    icon: Icon(FontAwesomeIcons.circlePlus, size : 34, color: Colors.red,), label: 'add'),
+                    icon: Icon(
+                      FontAwesomeIcons.circlePlus,
+                      size: 34,
+                      color: Colors.red,
+                    ),
+                    label: 'add'),
                 BottomNavigationBarItem(
-                     icon : Icon(FontAwesomeIcons.circleUser), label: 'Bookmark'),
+                    icon: Icon(FontAwesomeIcons.circleUser), label: 'Bookmark'),
                 BottomNavigationBarItem(
                     icon: Icon(FontAwesomeIcons.photoFilm), label: 'Profile'),
               ],
