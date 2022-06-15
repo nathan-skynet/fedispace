@@ -54,6 +54,9 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+        versionCode 25
+        versionName "0.1.5"
+
     }
 
     buildTypes {
