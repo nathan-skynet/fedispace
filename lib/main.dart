@@ -1,6 +1,7 @@
 // Initial Import
 
 import 'package:fedispace/routes/addposts/desc.dart';
+import 'package:fedispace/routes/addposts/send.dart';
 import 'package:fedispace/routes/addposts/view.dart';
 import 'package:fedispace/services/unifiedpush.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +71,8 @@ AwesomeNotifications().actionStream.listen(
           '/Notification' : (context) => Notif(apiService: apiService),
           '/View' : (context) => View(),
           '/Desc' : (context) => Desc(apiService: apiService),
+          '/sendPosts' : (context) => sendPosts(apiService: apiService),
+
         },
     );
   }

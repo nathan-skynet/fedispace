@@ -18,6 +18,7 @@ final _myController = SocialTextEditingController();
 List<String> fileNames = [];
 
 class _DescState extends State<Desc> {
+
   @override
   void initState() {
     super.initState();
@@ -30,7 +31,9 @@ class _DescState extends State<Desc> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body:
+
+      Column(
         children: [
           SizedBox(
               height: MediaQuery.of(context).size.height * 0.3,

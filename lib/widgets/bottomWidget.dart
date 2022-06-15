@@ -31,7 +31,6 @@ class _bottomWidget extends State<bottomWidget> {
       case 3:
         break;
       case 4:
-        Navigator.pushNamed(context, '/Desc');
         break;
     }
   }

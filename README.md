@@ -38,7 +38,7 @@ One of the main feature is the push notification that I plan to implement.
 - [ ] ScrollToUp
 - [x] Back History
 - [x] Alpha Testing
-- [ ] Beta Testing
+- [X] Beta Testing
 - [ ] Production
 
 

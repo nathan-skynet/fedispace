@@ -52,7 +52,8 @@ class ApiService {
     try {
       var resultat = content.replaceAll("\n", '\\n');
       
-      Map<String, dynamic> result = jsonDecode("""{"status": "$resultat", "media_ids": $media_ids}""");
+      Map<String, dynamic> result = jsonDecode("""{"status": "$resultat",  "application": { "name": "fedispace", "website": "https://git.echelon4.space/sk7n4k3d/fedispace"},
+      "media_ids": $media_ids}""");
 
       var response = await http.post( Uri.parse("${instanceUrl!}/api/v1/statuses"), body: jsonEncode(result),
         headers: <String, String>{
@@ -163,7 +164,7 @@ class ApiService {
           "client_name": "FediSpace",
           "redirect_uris": featherRedirectUri,
           "scopes": oauthScopes.join(" "),
-          "website": "https://git.echelon4.space/",
+          "website": "https://git.echelon4.space/sk7n4k3d/fedispace",
         },
       );
     } on Exception {

@@ -137,7 +137,10 @@ class NavBar extends StatelessWidget {
                                     TextStyle(fontSize: 18, color: Colors.red)),
                             leading: const Icon(FontAwesomeIcons.solidFaceAngry,
                                 color: Colors.red),
-                            onTap: () => apiService.logOut(),
+                            onTap: () async{
+                              await apiService.logOut();
+                              Navigator.of(context).pop(true);
+                            }
                           ),
                         ],
                       ),
