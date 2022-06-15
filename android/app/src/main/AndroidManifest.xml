@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="space.echelon4.fedispace">
+          package="space.echelon4.fedispace"
+          android:versionCode="25"
+          android:versionName="0.1.5">
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW"/>

@@ -30,5 +30,3 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-def vercode = 23
-def version = "0.1.5"
