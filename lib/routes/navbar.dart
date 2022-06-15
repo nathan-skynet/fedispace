@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import '../data/account.dart';
 import '../services/api.dart';
 
@@ -9,6 +11,7 @@ Account? account;
 
 class NavBar extends StatelessWidget {
   final ApiService apiService;
+
   const NavBar({required this.apiService, Key? key}) : super(key: key);
 
   String avatarurl() {
@@ -51,35 +54,31 @@ class NavBar extends StatelessWidget {
                         // Remove padding
                         padding: EdgeInsets.zero,
                         children: [
-
-                              UserAccountsDrawerHeader(
-                                accountName:
-                                    Text(account?.displayName ?? "none",
-                                        style: const TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.grey,
-                                        )),
-                                accountEmail: Text(account?.acct ?? "none"),
-                                currentAccountPicture: CircleAvatar(
-                                  child: ClipOval(
-                                    child: Image.network(
-                                      avatarurl(),
-                                      fit: BoxFit.cover,
-                                      width: 90,
-                                      height: 90,
-                                    ),
-                                  ),
-                                ),
-                                decoration: const BoxDecoration(
-                                  color: Colors.blue,
-                                  image: DecorationImage(
-                                      fit: BoxFit.fill,
-                                      image: NetworkImage(
-                                          'https://img.myloview.fr/images/abstract-square-pattern-on-gradient-background-pixel-tile-backdrop-graphic-art-random-square-shapes-texture-futuristic-cover-wallpaper-banner-poster-flyer-template-stock-vector-illustration-400-183616984.jpg')),
+                          UserAccountsDrawerHeader(
+                            accountName: Text(account?.displayName ?? "none",
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.grey,
+                                )),
+                            accountEmail: Text(account?.acct ?? "none"),
+                            currentAccountPicture: CircleAvatar(
+                              child: ClipOval(
+                                child: Image.network(
+                                  avatarurl(),
+                                  fit: BoxFit.cover,
+                                  width: 90,
+                                  height: 90,
                                 ),
                               ),
-
-                          
+                            ),
+                            decoration: const BoxDecoration(
+                              color: Colors.blue,
+                              image: DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: NetworkImage(
+                                      'https://img.myloview.fr/images/abstract-square-pattern-on-gradient-background-pixel-tile-backdrop-graphic-art-random-square-shapes-texture-futuristic-cover-wallpaper-banner-poster-flyer-template-stock-vector-illustration-400-183616984.jpg')),
+                            ),
+                          ),
                           ListTile(
                             leading: const Icon(FontAwesomeIcons.user),
                             title: const Text('Profile',
@@ -132,16 +131,16 @@ class NavBar extends StatelessWidget {
                           ),
                           const Divider(),
                           ListTile(
-                            title: const Text('Logout',
-                                style:
-                                    TextStyle(fontSize: 18, color: Colors.red)),
-                            leading: const Icon(FontAwesomeIcons.solidFaceAngry,
-                                color: Colors.red),
-                            onTap: () async{
-                              await apiService.logOut();
-                              Navigator.of(context).pop(true);
-                            }
-                          ),
+                              title: const Text('Logout',
+                                  style: TextStyle(
+                                      fontSize: 18, color: Colors.red)),
+                              leading: const Icon(
+                                  FontAwesomeIcons.solidFaceAngry,
+                                  color: Colors.red),
+                              onTap: () async {
+                                await apiService.logOut();
+                                exit(0);
+                              }),
                         ],
                       ),
                     )));
