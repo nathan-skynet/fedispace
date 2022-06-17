@@ -83,7 +83,7 @@ class _sendPostsState extends State<sendPosts> {
                       },
                     ),
                   ),
-                  Container(
+                  SizedBox(
                     width: MediaQuery.of(context).size.width -
                         (MediaQuery.of(context).size.width * 0.3) -
                         3,

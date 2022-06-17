@@ -25,8 +25,8 @@ class _Login extends State<Login> {
   Future<void> onValidAuth() async {
     final account = await widget.apiService.logIn();
 
-    await widget.unifiedPushService.InitUnifiedPush();
-    await widget.unifiedPushService.StartUnifiedPush(context);
+    //await widget.unifiedPushService.InitUnifiedPush();
+    //await widget.unifiedPushService.StartUnifiedPush(context);
 
     Fluttertoast.showToast(
         msg: "Successfully logged in. Welcome, ${account.username}!",

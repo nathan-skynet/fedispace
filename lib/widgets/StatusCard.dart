@@ -3,33 +3,31 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:flutter_blurhash/flutter_blurhash.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:fedispace/data/favourited.dart';
+import 'package:fedispace/data/status.dart';
+import 'package:fedispace/services/api.dart';
+import 'package:fedispace/utils/messages.dart';
+import 'package:fedispace/widgets/HeaderStatusCard.dart';
+import 'package:fedispace/widgets/LikedByStatusCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter_share_me/flutter_share_me.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/shims/dart_ui_real.dart';
-import 'package:audioplayers/audioplayers.dart';
-import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
-import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
-import 'package:video_viewer/video_viewer.dart';
-import 'package:like_button/like_button.dart';
-
-import 'package:carousel_slider/carousel_slider.dart';
-
-import 'package:fedispace/widgets/LikedByStatusCard.dart';
-import 'package:fedispace/widgets/HeaderStatusCard.dart';
-import 'package:fedispace/data/favourited.dart';
-import 'package:fedispace/utils/messages.dart';
-import 'package:fedispace/services/api.dart';
-import 'package:fedispace/data/status.dart';
+import 'package:flutter_share_me/flutter_share_me.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
+import 'package:like_button/like_button.dart';
+import 'package:video_viewer/video_viewer.dart';
+import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 class StatusCard extends StatefulWidget {
   final ApiService apiService;
   final Status initialStatus;
+
   const StatusCard(
     this.initialStatus, {
     Key? key,
@@ -155,7 +153,7 @@ class _StatusCardState extends State<StatusCard> {
     }
   }
 
-/// TODO change Share with SharePlus
+  /// TODO change Share with SharePlus
   final FlutterShareMe flutterShareMe = FlutterShareMe();
 
   late Uint8List imageDataBytes;
@@ -201,8 +199,7 @@ class _StatusCardState extends State<StatusCard> {
                         enableVerticalSwapingGesture: false,
                         enableHorizontalSwapingGesture: false,
                         onFullscreenFixLandscape: false,
-                        style: VideoViewerStyle(
-                        ),
+                        style: VideoViewerStyle(),
                         controller: controller,
                         source: {
                           status.attach: VideoSource(
@@ -233,11 +230,11 @@ class _StatusCardState extends State<StatusCard> {
                                           const Icon(Icons.error),
                                       imageBuilder: (context, imageProvider) =>
                                           Container(
-                                              margin: const EdgeInsets
-                                                      .symmetric(
-                                                  horizontal: 0,
-                                                  vertical:
-                                                      5), //apply padding horizontal or vertical only
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 0,
+                                                      vertical: 5),
+                                              //apply padding horizontal or vertical only
                                               width: 490,
                                               height: 290,
                                               decoration: BoxDecoration(
@@ -285,21 +282,21 @@ class _StatusCardState extends State<StatusCard> {
                                   twoTouchOnly: true, // Defaults to false
                                   child: CachedNetworkImage(
                                       imageUrl: status.attach,
-                                      placeholder: (context, url) => Container(
+                                      placeholder: (context, url) => SizedBox(
                                             width: 490,
                                             height: 290,
-                                            child: BlurHash(
-                                                hash: status.blurhash!),
+                                            child:
+                                                BlurHash(hash: status.blurhash),
                                           ),
                                       errorWidget: (context, url, error) =>
                                           const Icon(Icons.error),
                                       imageBuilder: (context, imageProvider) =>
                                           Container(
-                                              margin: const EdgeInsets
-                                                      .symmetric(
-                                                  horizontal: 0,
-                                                  vertical:
-                                                      5), //apply padding horizontal or vertical only
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 0,
+                                                      vertical: 5),
+                                              //apply padding horizontal or vertical only
                                               width: 490,
                                               height: 290,
                                               decoration: BoxDecoration(
@@ -363,9 +360,9 @@ class _StatusCardState extends State<StatusCard> {
                     } else if (snapshot.hasError) {}
                     return Container();
                   }),
-               SizedBox(height: 5),
+              const SizedBox(height: 5),
               Container(
-                padding:  EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -381,11 +378,11 @@ class _StatusCardState extends State<StatusCard> {
                         const SizedBox(width: 5),
                       ],
                     ),
-                     SizedBox(height: 10),
-                     Divider(),
+                    const SizedBox(height: 10),
+                    const Divider(),
                     //status.replies_count != 0
-                       // ? animatedContainerDemoScreenState("See ${status.replies_count.toString()} comments")
-                      //  : Container(),
+                    // ? animatedContainerDemoScreenState("See ${status.replies_count.toString()} comments")
+                    //  : Container(),
                     Container(),
                     const SizedBox(height: 15),
                   ],

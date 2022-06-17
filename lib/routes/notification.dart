@@ -1,8 +1,7 @@
+import 'dart:convert';
 import 'dart:core';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:convert';
 
 import '../services/api.dart';
 
@@ -11,6 +10,7 @@ class Notif extends StatefulWidget implements PreferredSizeWidget {
 
   /// Main instance of the API service to use in the widget.
   Notif({Key? key, required this.apiService}) : super(key: key);
+
   @override
   State<Notif> createState() => _Notification();
 
@@ -20,6 +20,7 @@ class Notif extends StatefulWidget implements PreferredSizeWidget {
 
 class _Notification extends State<Notif> with TickerProviderStateMixin {
   List notificationState = [];
+
   @override
   void initState() {
     super.initState();
@@ -147,7 +148,6 @@ Widget _body2(domain, data) {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         Text(
                           data[index]["account"]["display_name"] != ""
                               ? data[index]["account"]["display_name"]
@@ -183,7 +183,7 @@ Widget _body2(domain, data) {
                             child: const Text(
                               "Requested to follow you",
                               style:
-                              TextStyle(color: Colors.black, fontSize: 15),
+                                  TextStyle(color: Colors.black, fontSize: 15),
                             ),
                           ),
                         ],
@@ -193,30 +193,32 @@ Widget _body2(domain, data) {
                             child: const Text(
                               "Mentioned you in their status",
                               style:
-                              TextStyle(color: Colors.black, fontSize: 15),
+                                  TextStyle(color: Colors.black, fontSize: 15),
                             ),
                           ),
                         ],
-                         //   Container(
+                        //   Container(
                         //  padding: const EdgeInsets.only(top: 5),
                         // child: const Text(
                         //    "Dev, do you have a moment?We'd love",
                         //    style: TextStyle(
-                                // color: Colors.black,
+                        // color: Colors.black,
                         //        fontSize: 11),
-                       //   ),
+                        //   ),
                         //),
                       ],
                     ),
                   ),
                   Expanded(
-                     flex : 50,
+                    flex: 50,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.start,
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(convertToAgo(DateTime.parse(data[index]["created_at"])),
+                        Text(
+                          convertToAgo(
+                              DateTime.parse(data[index]["created_at"])),
                           style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -238,7 +240,6 @@ Widget _body2(domain, data) {
                       ],
                     ),
                   )
-
                 ],
               ),
             ),

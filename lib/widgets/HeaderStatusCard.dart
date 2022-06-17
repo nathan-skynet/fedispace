@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:fedispace/services/api.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter/material.dart';
 
 class HeaderStatusCard extends StatelessWidget {
   final postsAccount;

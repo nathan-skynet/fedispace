@@ -1,22 +1,25 @@
 // ignore_for_file: avoid_print, non_constant_identifier_names
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:fedispace/data/account.dart';
+import 'package:fedispace/data/status.dart';
+import 'package:fedispace/helpers/auth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
-import 'package:fedispace/helpers/auth.dart';
-import 'package:fedispace/data/status.dart';
-import 'package:fedispace/data/account.dart';
-import '../data/accountUsers.dart';
 
+import '../data/accountUsers.dart';
 
 class ApiException implements Exception {
   final String message;
+
   ApiException(this.message);
 }
+
 class ApiService {
   static const FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
@@ -48,46 +51,55 @@ class ApiService {
   }
 
 // TODO A VRAIMENT REVOIR !!!!!!!!
-  Future<int>createPosts(String Token, String content, String in_reply_to_id, List media_ids,String sensitive,String spoiler_text, String visibility ) async {
+  Future<int> createPosts(
+      String Token,
+      String content,
+      String in_reply_to_id,
+      List media_ids,
+      String sensitive,
+      String spoiler_text,
+      String visibility) async {
     try {
       var resultat = content.replaceAll("\n", '\\n');
-      
-      Map<String, dynamic> result = jsonDecode("""{"status": "$resultat",  "application": { "name": "fedispace", "website": "https://git.echelon4.space/sk7n4k3d/fedispace"},
+
+      Map<String, dynamic> result = jsonDecode(
+          """{"status": "$resultat",  "application": { "name": "fedispace", "website": "https://git.echelon4.space/sk7n4k3d/fedispace"},
       "media_ids": $media_ids}""");
 
-      var response = await http.post( Uri.parse("${instanceUrl!}/api/v1/statuses"), body: jsonEncode(result),
+      var response = await http.post(
+        Uri.parse("${instanceUrl!}/api/v1/statuses"),
+        body: jsonEncode(result),
         headers: <String, String>{
           "Content-Type": "application/json",
           "Authorization": "Bearer $Token",
         },
-    );
+      );
 
       int resultCode = response.statusCode;
       print(result);
       print(response.statusCode.toString());
       print(response.body);
-      if(resultCode == 200){
+      if (resultCode == 200) {
         AwesomeNotifications().createNotification(
           content: NotificationContent(
-              id: 1,
-              channelKey: 'internal',
-              title: 'Success post uploaded',
-              body: "Your post is on Pixelfed",
+            id: 1,
+            channelKey: 'internal',
+            title: 'Success post uploaded',
+            body: "Your post is on Pixelfed",
           ),
         );
         return 200;
       }
       return 0;
-    }
-    catch (err) {
+    } catch (err) {
       print("erreur dans la fonction posts");
       print(err);
       AwesomeNotifications().createNotification(
         content: NotificationContent(
-            id: 1,
-            channelKey: 'internal',
-            title: 'Uploading pots failed',
-            body: 'Error : $err',
+          id: 1,
+          channelKey: 'internal',
+          title: 'Uploading pots failed',
+          body: 'Error : $err',
         ),
       );
       return 0;
@@ -95,7 +107,7 @@ class ApiService {
   }
 
   // TODO A VRAIMENT REVOIR !!!!!!!!
-  Future<int?> apiPostMedia(String description,List filename) async {
+  Future<int?> apiPostMedia(String description, List filename) async {
     try {
       List<String> listId = [];
       var uri = Uri.parse("${instanceUrl!}/api/v2/media");
@@ -103,18 +115,20 @@ class ApiService {
       String? Token = token?.accessToken.toString();
 
       for (int i = 0; i < filename.length; i++) {
+        var request = http.MultipartRequest('POST', uri);
 
-      var request = http.MultipartRequest('POST', uri);
-
-      request.headers.addAll({
-        'Content-Type': 'multipart/form-data',
-        'Authorization': 'Bearer $Token',
-
-      });
-      request.fields['description'] = description;
-      print(filename.length);
+        request.headers.addAll({
+          'Content-Type': 'multipart/form-data',
+          'Authorization': 'Bearer $Token',
+        });
+        request.fields['description'] = description;
+        print(filename.length);
         print(filename[i]);
-         request.files.add(await http.MultipartFile("file",  File(filename[i]).readAsBytes().asStream(), File(filename[i]).lengthSync(), filename: filename[i].split("/").last));
+        request.files.add(await http.MultipartFile(
+            "file",
+            File(filename[i]).readAsBytes().asStream(),
+            File(filename[i]).lengthSync(),
+            filename: filename[i].split("/").last));
         var response = await request.send();
         var responsed = await http.Response.fromStream(response);
         final responseData = json.decode(responsed.body);
@@ -123,31 +137,30 @@ class ApiService {
       }
       print(listId);
 
-      return await createPosts(Token.toString(), description, "null",listId, "null", "null", "public" );
-    }
-    catch (err) {
+      return await createPosts(Token.toString(), description, "null", listId,
+          "null", "null", "public");
+    } catch (err) {
       print("erroor");
       print(err);
       return null;
     }
-    }
+  }
 
-
-  Future  getNotification()async{
+  Future getNotification() async {
     final apiUrl = "${instanceUrl!}/api/v1/notifications";
     http.Response resp;
     try {
-      resp = await  _apiGet(apiUrl,);
-    }on Exception {
+      resp = await _apiGet(
+        apiUrl,
+      );
+    } on Exception {
       throw ApiException(
         "Error connecting to server on `getNotification`",
       );
     }
     if (resp.statusCode == 200) {
-
       print(resp.body);
       return resp.body;
-
     }
     throw ApiException(
       "Unexpected status code ${resp.statusCode} on `getClientCredentials`",
@@ -213,7 +226,8 @@ class ApiService {
     // Persisting information in secure storage
     await secureStorage.write(key: "instanceUrl", value: instanceUrl);
     await secureStorage.write(key: "oauthClientId", value: oauthClientId);
-    await secureStorage.write(key: "oauthClientSecret", value: oauthClientSecret);
+    await secureStorage.write(
+        key: "oauthClientSecret", value: oauthClientSecret);
   }
 
   Future<void> loadApiServiceFromStorage() async {
@@ -223,57 +237,56 @@ class ApiService {
     setHelper();
   }
 
-  Future<bool> NodeInfo(domain) async{
-    try{
+  Future<bool> NodeInfo(domain) async {
+    try {
       String apiUrl;
       print(domain);
       if (domain.toString().contains("://")) {
         apiUrl = "${domain}/api/v1/instance";
       } else {
-        apiUrl  = "https://${domain.toString()}/api/v1/instance";
-
+        apiUrl = "https://${domain.toString()}/api/v1/instance";
       }
       print(apiUrl);
       http.Response resp = await http.get(Uri.parse(apiUrl));
       print(jsonDecode(resp.body));
       if (resp.statusCode == 200) {
         print(jsonDecode(resp.body));
-        if(jsonDecode(resp.body)[0]["metadata"]["nodeName"] == "Pixelfed" && jsonDecode(resp.body)[0]["config"]["features"]["mobile_apis"] == true){
+        if (jsonDecode(resp.body)[0]["metadata"]["nodeName"] == "Pixelfed" &&
+            jsonDecode(resp.body)[0]["config"]["features"]["mobile_apis"] ==
+                true) {
           print("ok");
           return true;
         }
         print("pas ok");
         return false;
       }
-    }
-    catch(e){
+    } catch (e) {
       print("pas ok");
       return false;
     }
     return false;
   }
 
-  Future<String> GetRepliesBy(String id) async{
-  String apiUrl;
-  apiUrl = "${instanceUrl!}/api/v1/statuses/$id/favourited_by";
-  http.Response resp =  await _apiGet(apiUrl);
-  if (resp.statusCode == 200) {
-    return resp.body;
-  }
-  throw ApiException(
-    "Unexpected status code ${resp.statusCode} on `getStatusList`",
-  );
-}
-
-  Future<List<Status>> getStatusList( String? maxId, int limit,timeLine) async {
+  Future<String> GetRepliesBy(String id) async {
     String apiUrl;
-    if(timeLine == "home"){
-      apiUrl = "${instanceUrl!}/api/v1/timelines/home?limit=20";
+    apiUrl = "${instanceUrl!}/api/v1/statuses/$id/favourited_by";
+    http.Response resp = await _apiGet(apiUrl);
+    if (resp.statusCode == 200) {
+      return resp.body;
     }
-    else{
+    throw ApiException(
+      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+    );
+  }
+
+  Future<List<Status>> getStatusList(String? maxId, int limit, timeLine) async {
+    String apiUrl;
+    if (timeLine == "home") {
+      apiUrl = "${instanceUrl!}/api/v1/timelines/home?limit=20";
+    } else {
       apiUrl = "${instanceUrl!}/api/v1/timelines/public?limit=20";
     }
-   print(apiUrl);
+    print(apiUrl);
     if (maxId != null) {
       apiUrl += "&max_id=$maxId";
     }
@@ -283,13 +296,15 @@ class ApiService {
       // The response is a list of json objects
       List<dynamic> jsonDataList = jsonDecode(resp.body);
       return jsonDataList
-          .map((statusData) => Status.fromJson(statusData as Map<String, dynamic>),).toList();
+          .map(
+            (statusData) => Status.fromJson(statusData as Map<String, dynamic>),
+          )
+          .toList();
     }
     throw ApiException(
       "Unexpected status code ${resp.statusCode} on `getStatusList`",
     );
   }
-
 
   /// Returns the current account as cached in the instance,
   /// retrieving the account details from the API first if needed.
@@ -321,22 +336,21 @@ class ApiService {
   }
 
   String? domainURL() {
-    return  instanceUrl;
+    return instanceUrl;
   }
 
-
   Future<AccountUsers> getUserAccount(id) async {
-      final apiUrl = "${instanceUrl!}/api/v1/accounts/${id}";
-      http.Response resp = await _apiGet(apiUrl);
-      if (resp.statusCode == 200) {
-        Map<String, dynamic> jsonData = jsonDecode(resp.body);
-        currentAccountOfUsers = AccountUsers.fromJson(jsonData);
-        return currentAccountOfUsers!;
-      }
-      print(resp.statusCode);
-      throw ApiException(
-        "Unexpected status code ${resp.statusCode} on `getAccount`",
-      );
+    final apiUrl = "${instanceUrl!}/api/v1/accounts/${id}";
+    http.Response resp = await _apiGet(apiUrl);
+    if (resp.statusCode == 200) {
+      Map<String, dynamic> jsonData = jsonDecode(resp.body);
+      currentAccountOfUsers = AccountUsers.fromJson(jsonData);
+      return currentAccountOfUsers!;
+    }
+    print(resp.statusCode);
+    throw ApiException(
+      "Unexpected status code ${resp.statusCode} on `getAccount`",
+    );
   }
 
   Future<Status> statusByID(String statusId) async {
@@ -424,7 +438,6 @@ class ApiService {
     );
   }
 
-
   /// Performs an authenticated query to the API in order to force the log-in
   /// view. In the process, sets the `this.currentAccount` instance attribute.
   ///
@@ -441,7 +454,6 @@ class ApiService {
     await _apiPost(apiUrl);
     await helper!.removeAllTokens();
     await resetApiServiceState();
-
   }
 
   Future<bool> muteUser(userId) async {
@@ -462,7 +474,6 @@ class ApiService {
       "Unexpected status code ${resp.statusCode} on `getStatusList`",
     );
   }
-
 
   Future<bool> unmuteUser(userId) async {
     final apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/unmute";
@@ -559,8 +570,24 @@ class ApiService {
     );
   }
 
+  Future<Object> getUserStatus(userId, pageIndex) async {
+    final String apiUrl;
 
+    if (pageIndex != 0) {
+      apiUrl =
+          "${instanceUrl!}/api/v1/accounts/${userId}/statuses?page=${pageIndex.toString()}";
+    } else {
+      apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/statuses";
+    }
 
+    http.Response resp = await _apiGet(apiUrl);
+    if (resp.statusCode == 200) {
+      return resp.body;
+    }
+    throw ApiException(
+      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+    );
+  }
 
   /// Revokes all API service credentials & state variables from the
   /// device's secure storage, and sets their values as `null` in the
@@ -577,4 +604,3 @@ class ApiService {
     helper = null;
   }
 }
-

@@ -1,10 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
-
 import 'dart:convert';
 
 import 'account.dart';
-import 'media_attachement.dart';
 
 /// The [Status] class represents information for a given status (toot)
 /// made in a Mastodon instance.
@@ -13,7 +11,8 @@ import 'media_attachement.dart';
 ///
 /// TODO: fill in all necessary fields
 ///
-List<Status> userFromJson(String str) => List<Status>.from(json.decode(str).map((x) => Status.fromJson(x)));
+List<Status> userFromJson(String str) =>
+    List<Status>.from(json.decode(str).map((x) => Status.fromJson(x)));
 
 //String userToJson(List<Status> data) => json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
@@ -22,7 +21,7 @@ class Status {
   final String content;
   final Account account;
   final bool favorited;
-   final bool reblogged;
+  final bool reblogged;
   final String visibility;
   final String uri;
   final String url;
@@ -71,57 +70,56 @@ class Status {
   });
 
   factory Status.fromJson(Map<String, dynamic> data) => Status(
-          id: data["id"]  ??  "none",
-          content: data["content"] ?? "none",
-          account: Account.fromJson(data["account"]!),
-          favorited: data["favourited"] ?? false,
-          reblogged: data["reblogged"] ?? false,
-          visibility: data["visibility"] ?? "none",
-          uri: data["uri"] ?? "none" ,
-          url: data["url"] ?? "none",
-          in_reply_to_id: data["in_reply_to_id"] ?? "none",
-          in_reply_to_account_id: data["in_reply_to_account_id"] ?? "none",
-          muted: data["muted"] ?? false ,
-          sensitive: data["sensitive"] ?? false,
-          spoiler_text: data["spoiler_text"] ?? "none",
-          language: data["language"] ?? "none",
-          avatar: data["account"]["avatar"] ?? "none" ,
-          acct : data["account"]["acct"] ?? "none",
-          attach : data["media_attachments"][0]["url"] ?? "none",
-          preview_url : data["media_attachments"][0]["preview_url"] ?? "none",
-          created_at : data["created_at"] ?? "none",
-          favourites_count : data["favourites_count"] ?? 0,
-          replies_count : data["replies_count"] ?? 0,
-          attachement: List.castFrom<dynamic, dynamic>(data['media_attachments']),
-          blurhash :  data["media_attachments"][0]["blurhash"] ?? "L5H2EC=PM+yV0g-mq.wG9c010J}I",
-          reblogs_count : data["reblogs_count"] ?? "none" ,
-
+        id: data["id"] ?? "none",
+        content: data["content"] ?? "none",
+        account: Account.fromJson(data["account"]!),
+        favorited: data["favourited"] ?? false,
+        reblogged: data["reblogged"] ?? false,
+        visibility: data["visibility"] ?? "none",
+        uri: data["uri"] ?? "none",
+        url: data["url"] ?? "none",
+        in_reply_to_id: data["in_reply_to_id"] ?? "none",
+        in_reply_to_account_id: data["in_reply_to_account_id"] ?? "none",
+        muted: data["muted"] ?? false,
+        sensitive: data["sensitive"] ?? false,
+        spoiler_text: data["spoiler_text"] ?? "none",
+        language: data["language"] ?? "none",
+        avatar: data["account"]["avatar"] ?? "none",
+        acct: data["account"]["acct"] ?? "none",
+        attach: data["media_attachments"][0]["url"] ?? "none",
+        preview_url: data["media_attachments"][0]["preview_url"] ?? "none",
+        created_at: data["created_at"] ?? "none",
+        favourites_count: data["favourites_count"] ?? 0,
+        replies_count: data["replies_count"] ?? 0,
+        attachement: List.castFrom<dynamic, dynamic>(data['media_attachments']),
+        blurhash: data["media_attachments"][0]["blurhash"] ??
+            "L5H2EC=PM+yV0g-mq.wG9c010J}I",
+        reblogs_count: data["reblogs_count"] ?? "none",
       );
 
-     Map<String, dynamic> toJson() => {
-          "id": id,
-          "content": content,
-          "account": account,
-          "favorited": favorited,
-          "reblogged": reblogged,
-           "visibility": visibility,
-           "uri": uri,
-           "url": url,
-           "in_reply_to_id": in_reply_to_id,
-           "in_reply_to_account_id": in_reply_to_account_id,
-           "muted": muted,
-           "sensitive": sensitive,
-           "spoiler_text": spoiler_text,
-           "language": language,
-           "avatar" : avatar,
-           "acct" :acct,
-           "attach" : attach,
-           "preview_url" :  preview_url ,
-           "created_at" : created_at,
-           "favourites_count" : favourites_count,
-           "replies_count" : replies_count,
-           "attachement" : attachement,
-           "reblogs_count" :  reblogs_count,
-
-  };
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "content": content,
+        "account": account,
+        "favorited": favorited,
+        "reblogged": reblogged,
+        "visibility": visibility,
+        "uri": uri,
+        "url": url,
+        "in_reply_to_id": in_reply_to_id,
+        "in_reply_to_account_id": in_reply_to_account_id,
+        "muted": muted,
+        "sensitive": sensitive,
+        "spoiler_text": spoiler_text,
+        "language": language,
+        "avatar": avatar,
+        "acct": acct,
+        "attach": attach,
+        "preview_url": preview_url,
+        "created_at": created_at,
+        "favourites_count": favourites_count,
+        "replies_count": replies_count,
+        "attachement": attachement,
+        "reblogs_count": reblogs_count,
+      };
 }

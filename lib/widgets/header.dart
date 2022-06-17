@@ -1,14 +1,13 @@
 // import 'dart:ui';
-import 'package:flutter/material.dart';
-import 'package:fedispace/services/api.dart';
 import 'package:fedispace/data/account.dart';
+import 'package:fedispace/services/api.dart';
+import 'package:flutter/material.dart';
 
-var _icon = Icons.wb_sunny;
-var _color = Colors.white;
 Account? account;
 
 class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   final ApiService apiService;
+
   const HeaderWidget({required this.apiService, Key? key}) : super(key: key);
 
   Future<Object> fetchAccount() async {
@@ -32,30 +31,29 @@ class HeaderWidget extends StatelessWidget implements PreferredSizeWidget {
         builder: (BuildContext context, AsyncSnapshot<Object> snapshot) {
           if (snapshot.hasData) {
             return AppBar(
-              elevation: 20,
-              centerTitle: false,
-              excludeHeaderSemantics: true,
-              automaticallyImplyLeading: false,
-              leading: Container(),
+                elevation: 20,
+                centerTitle: false,
+                excludeHeaderSemantics: true,
+                automaticallyImplyLeading: false,
+                leading: Container(),
                 flexibleSpace: Container(
-                    decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(20),bottomRight: Radius.circular(20)),
-                        gradient: LinearGradient(
-                            colors: [Colors.blueGrey,Colors.grey],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter
-                        )
-                    ),
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20)),
+                      gradient: LinearGradient(
+                          colors: [Colors.blueGrey, Colors.grey],
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter)),
                 ),
-              title:Container(
-                margin: const EdgeInsetsDirectional.all(10),
-                  child :  const Text('FEDI SPACE',
+                title: Container(
+                  margin: const EdgeInsetsDirectional.all(10),
+                  child: const Text('FEDI SPACE',
                       style: TextStyle(
                         fontFamily: 'glitch',
                         fontSize: 30,
-                      )
-              ),)
-            );
+                      )),
+                ));
           } else if (snapshot.hasError) {
             return const Text('Has error in function');
           }
