@@ -1,8 +1,8 @@
 // ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
-import 'package:fedispace/data/account.dart';
-import 'package:fedispace/routes/homepage/login.dart';
-import 'package:fedispace/services/api.dart';
-import 'package:fedispace/services/unifiedpush.dart';
+import 'package:fedispace/core/api.dart';
+import 'package:fedispace/core/unifiedpush.dart';
+import 'package:fedispace/models/account.dart';
+import 'package:fedispace/routes/homepage/homepage2.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

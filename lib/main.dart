@@ -2,17 +2,17 @@
 
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:camera/camera.dart';
-import 'package:fedispace/routes/addposts/desc.dart';
-import 'package:fedispace/routes/addposts/send.dart';
-import 'package:fedispace/routes/addposts/view.dart';
-import 'package:fedispace/routes/login.dart';
-import 'package:fedispace/routes/notification.dart';
+import 'package:fedispace/core/api.dart';
+import 'package:fedispace/core/notification.dart';
+import 'package:fedispace/core/unifiedpush.dart';
+import 'package:fedispace/routes/homepage/homepage.dart';
+import 'package:fedispace/routes/post/desc.dart';
+import 'package:fedispace/routes/post/send.dart';
+import 'package:fedispace/routes/post/takecamera.dart';
+import 'package:fedispace/routes/post/view.dart';
 import 'package:fedispace/routes/presentation/home.dart';
-import 'package:fedispace/routes/profile.dart';
-import 'package:fedispace/routes/takecamera.dart';
-import 'package:fedispace/routes/timeline.dart';
-import 'package:fedispace/services/api.dart';
-import 'package:fedispace/services/unifiedpush.dart';
+import 'package:fedispace/routes/profile/profile.dart';
+import 'package:fedispace/routes/timeline/timeline.dart';
 import 'package:fedispace/themes/dark.dart';
 import 'package:fedispace/themes/light.dart';
 import 'package:flutter/material.dart';

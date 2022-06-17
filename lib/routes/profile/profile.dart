@@ -1,12 +1,11 @@
 // Initial Import
 import 'dart:convert';
 
-import 'package:fedispace/services/api.dart';
+import 'package:fedispace/core/api.dart';
+import 'package:fedispace/models/account.dart';
+import 'package:fedispace/models/accountUsers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-
-import '../data/account.dart';
-import '../data/accountUsers.dart';
 
 var UserAccount;
 

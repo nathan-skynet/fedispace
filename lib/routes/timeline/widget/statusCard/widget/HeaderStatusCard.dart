@@ -1,4 +1,4 @@
-import 'package:fedispace/services/api.dart';
+import 'package:fedispace/core/api.dart';
 import 'package:flutter/material.dart';
 
 class HeaderStatusCard extends StatelessWidget {

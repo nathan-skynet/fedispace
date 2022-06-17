@@ -1,11 +1,10 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:fedispace/core/api.dart';
+import 'package:fedispace/models/account.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import '../data/account.dart';
-import '../services/api.dart';
 
 Account? account;
 

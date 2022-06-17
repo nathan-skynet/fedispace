@@ -1,12 +1,11 @@
 import 'dart:io';
 
+import 'package:fedispace/core/api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vibrate/flutter_vibrate.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-
-import '../../services/api.dart';
 
 List fileNames = [];
 

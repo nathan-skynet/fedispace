@@ -1,18 +1,26 @@
 // ignore_for_file: avoid_print, non_constant_identifier_names
+
+/// Import Flutter
+///
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:awesome_notifications/awesome_notifications.dart';
-import 'package:fedispace/data/account.dart';
-import 'package:fedispace/data/status.dart';
+
+/// Import Fedispace
+///
 import 'package:fedispace/helpers/auth.dart';
+import 'package:fedispace/models/account.dart';
+import 'package:fedispace/models/accountUsers.dart';
+import 'package:fedispace/models/status.dart';
+
+///Import Plugins
+///
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
-
-import '../data/accountUsers.dart';
 
 class ApiException implements Exception {
   final String message;

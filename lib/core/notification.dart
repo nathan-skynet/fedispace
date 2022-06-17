@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'dart:core';
 
+import 'package:fedispace/core/api.dart';
 import 'package:flutter/material.dart';
-
-import '../services/api.dart';
 
 class Notif extends StatefulWidget implements PreferredSizeWidget {
   final ApiService apiService;

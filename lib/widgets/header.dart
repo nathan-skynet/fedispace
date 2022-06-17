@@ -1,6 +1,6 @@
 // import 'dart:ui';
-import 'package:fedispace/data/account.dart';
-import 'package:fedispace/services/api.dart';
+import 'package:fedispace/core/api.dart';
+import 'package:fedispace/models//account.dart';
 import 'package:flutter/material.dart';
 
 Account? account;

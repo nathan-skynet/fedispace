@@ -1,6 +1,6 @@
+import 'package:fedispace/core/api.dart';
+import 'package:fedispace/core/unifiedpush.dart';
 import 'package:fedispace/routes/homepage/inputWidget.dart';
-import 'package:fedispace/services/api.dart';
-import 'package:fedispace/services/unifiedpush.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';

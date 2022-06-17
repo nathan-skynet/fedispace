@@ -1,16 +1,16 @@
 // ignore_for_file: non_constant_identifier_names, avoid_print
 import 'dart:io';
 
-import 'package:fedispace/data/account.dart';
-import 'package:fedispace/data/status.dart';
-import 'package:fedispace/services/api.dart';
-import 'package:fedispace/widgets/StatusCard.dart';
+import 'package:fedispace/core/api.dart';
+import 'package:fedispace/models/account.dart';
+import 'package:fedispace/models/status.dart';
+import 'package:fedispace/routes/timeline/widget/navbar.dart';
+import 'package:fedispace/routes/timeline/widget/statusCard/StatusCard.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
-import '../widgets/bottomWidget.dart';
-import 'navbar.dart';
+import '/widgets/bottomWidget.dart';
 
 class Timeline extends StatefulWidget implements PreferredSizeWidget {
   final ApiService apiService;
