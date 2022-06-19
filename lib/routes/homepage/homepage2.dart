@@ -6,6 +6,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:io';
+
+String os = Platform.operatingSystem;
 
 class Login extends StatefulWidget {
   /// Main instance of the API service to use in the widget.
@@ -25,8 +28,12 @@ class _Login extends State<Login> {
   Future<void> onValidAuth() async {
     final account = await widget.apiService.logIn();
 
-    //await widget.unifiedPushService.InitUnifiedPush();
-    //await widget.unifiedPushService.StartUnifiedPush(context);
+    /// TODO REVOIR UNIFIEDPUSH ENCORE UNE FOIS ET NOTIFICATION SERVICE
+    ///
+    if (Platform.isAndroid){
+      await widget.unifiedPushService.InitUnifiedPush();
+      await widget.unifiedPushService.StartUnifiedPush(context);
+    }
 
     Fluttertoast.showToast(
         msg: "Successfully logged in. Welcome, ${account.username}!",
@@ -44,7 +51,7 @@ class _Login extends State<Login> {
       await widget.apiService.registerApp(instanceUrl);
     } on ApiException {
       Fluttertoast.showToast(
-          msg: "Error in function LogInAction !",
+          msg: "Your instance has activated Mobile API ?",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 2,

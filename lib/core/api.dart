@@ -578,19 +578,22 @@ class ApiService {
     );
   }
 
-  Future<Object> getUserStatus(userId, pageIndex) async {
+  Future getUserStatus(userId, pageIndex , String? minId) async {
     final String apiUrl;
-
-    if (pageIndex != 0) {
+    if (pageIndex > 1) {
       apiUrl =
-          "${instanceUrl!}/api/v1/accounts/${userId}/statuses?page=${pageIndex.toString()}";
+          "${instanceUrl!}/api/v1/accounts/${userId}/statuses?limit=16&only_media=true&max_id=${minId.toString()}";
     } else {
-      apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/statuses";
+      apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/statuses?limit=16&only_media=true&max_id=0";
     }
+    ///////
 
+
+    /////////
+    print(apiUrl);
     http.Response resp = await _apiGet(apiUrl);
     if (resp.statusCode == 200) {
-      return resp.body;
+      return jsonDecode(resp.body);
     }
     throw ApiException(
       "Unexpected status code ${resp.statusCode} on `getStatusList`",

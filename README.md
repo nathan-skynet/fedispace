@@ -7,7 +7,6 @@ One of the main feature is the push notification that I plan to implement.
 
 ## Contribute
 
-
 ### ANYONE can contribute:
 
 * If you have a phone with a camera (or an actual camera), you can contribute exercise photos. (These don't need to look particularly good. Even lower resolution living room shots are fine.)

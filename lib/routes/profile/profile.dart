@@ -1,11 +1,14 @@
 // Initial Import
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/models/account.dart';
 import 'package:fedispace/models/accountUsers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
+
 
 var UserAccount;
 
@@ -21,11 +24,14 @@ class Profile extends StatefulWidget {
 class _Profile extends State<Profile> {
   final apiService = ApiService();
   final title = 'Fedi Space';
-  int page = 0;
+  int page = 1;
   Account? account;
   AccountUsers? accountUsers;
 
   late Object jsonData;
+   List<Map<String, dynamic>> arrayOfProducts = [];
+  bool isPageLoading = false;
+
 
   String getFormattedNumber(int? inputNumber) {
     String result;
@@ -55,19 +61,50 @@ class _Profile extends State<Profile> {
     }
   }
 
-  String avatarUrl() {
+  void makeRebuild(){
+    setState(() {
+      print("rebuild");
+    });
+  }
+
+  Future <List<Map<String, dynamic>>> _callAPIToGetListOfData() async {
+    if (isPageLoading == true || (isPageLoading == false && page == 1 )){
+      final responseDic ;
+      if(arrayOfProducts.length == 0 ){
+        responseDic = await widget.apiService.getUserStatus(UserAccount.id, page, "0");
+      }else{
+        responseDic = await widget.apiService.getUserStatus(UserAccount.id, page, arrayOfProducts[arrayOfProducts.length-1]["id"]);
+      }
+      List<Map<String, dynamic>> temArr = List<Map<String, dynamic>>.from(responseDic);
+      print("_callAPIToGetListOfData");
+      print("page : ${page}");
+      print("length : ${arrayOfProducts.length}");
+      if (page == 1) {
+        print(responseDic[0]);
+        arrayOfProducts = temArr;
+      }
+      else {
+
+        print(responseDic[0]);
+        arrayOfProducts.addAll(temArr);
+      }
+      responseDic.forEach((element) {
+        print(element["id"]);
+      });
+      print(arrayOfProducts[arrayOfProducts.length -1]["id"]);
+      return arrayOfProducts;
+    }
+     return arrayOfProducts;
+  }
+
+
+    String avatarUrl() {
     var domain = widget.apiService.domainURL();
     if (UserAccount!.avatarUrl.contains("://")) {
       return UserAccount!.avatarUrl.toString();
     } else {
       return domain.toString() + UserAccount!.avatarUrl;
     }
-  }
-
-  Future getUserStatus(id, page) async {
-    var jsonResult = await widget.apiService.getUserStatus(id, page);
-    page++;
-    return jsonResult;
   }
 
   final ScrollController _scrollController = ScrollController();
@@ -79,7 +116,16 @@ class _Profile extends State<Profile> {
     _scrollController.addListener(() async {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        getUserStatus(UserAccount.id, page);
+        if (arrayOfProducts.length >= (16 * page)  ) {
+          page++;
+          print("PAGE NUMBER $page");
+          print("getting data");
+          isPageLoading = true;
+          await _callAPIToGetListOfData();
+          isPageLoading = false;
+          makeRebuild();
+        }
+
       }
     });
   }
@@ -235,28 +281,59 @@ class _Profile extends State<Profile> {
                         data: UserAccount?.note ?? "",
                       ),
                       FutureBuilder(
-                          future: getUserStatus(UserAccount.id, 0),
+                          future: _callAPIToGetListOfData(),
                           builder:
                               (BuildContext context, AsyncSnapshot snapshot) {
                             if (snapshot.data != null) {
-                              var data = jsonDecode(snapshot.data);
-                              //var data = snapshot.data;
-                              print(snapshot.data.length);
                               return Container(
-                                  height: 300,
-                                  width: 300,
+                                  height: 400,
+                                  width: 400,
                                   child: GridView.builder(
+                                    addAutomaticKeepAlives : true,
+                                    addRepaintBoundaries :  true,
+                                    addSemanticIndexes : true,
+                                    reverse : false,
                                     controller: _scrollController,
                                     gridDelegate:
                                         const SliverGridDelegateWithFixedCrossAxisCount(
                                       crossAxisCount: 3,
                                     ),
-                                    itemCount: data.length,
+                                    itemCount: snapshot.data.length,
                                     itemBuilder:
                                         (BuildContext context, int index) {
                                       //return Image.asset(images[index], fit: BoxFit.cover);
-                                      return Image.network(data[index]
-                                          ["media_attachments"][0]["url"]);
+                                      return Container(
+                                        child: CachedNetworkImage(
+                                            imageUrl: snapshot.data[index]
+                                            ["media_attachments"][0]["url"],
+                                            placeholder: (context, url) => BlurHash(
+                                                hash: snapshot.data[index]
+                                                ["media_attachments"][0]
+                                                ["blurhash"]),
+                                            errorWidget: (context, url, error) =>
+                                            const Icon(Icons.error),
+                                            imageBuilder: (context, imageProvider) =>
+                                                Container(
+                                                    margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 3,
+                                                        vertical: 3),
+                                                    //apply padding horizontal or vertical only
+                                                    width: 490,
+                                                    height: 290,
+                                                    decoration: BoxDecoration(
+                                                        border: Border.all(
+                                                          width: 1,
+                                                          color: Colors.black54,
+                                                        ),
+                                                        // Make rounded corners
+                                                        borderRadius: BorderRadius.circular(15),
+                                                      image: DecorationImage(
+                                                        image: imageProvider,
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    )))
+                                      );
                                     },
                                   ));
                             } else if (snapshot.hasError) {
