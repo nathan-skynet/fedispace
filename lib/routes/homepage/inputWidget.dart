@@ -38,6 +38,7 @@ class InputWidget extends StatelessWidget {
               decoration: const InputDecoration(
                   border: InputBorder.none,
                   hintText: "pix.echelon4.space",
+                  filled: false,
                   hintStyle: TextStyle(color: Color(0xFFE1E1E1), fontSize: 14)),
             ),
           ),

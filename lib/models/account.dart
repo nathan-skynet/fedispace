@@ -31,7 +31,9 @@ class Account {
   final int  statuses_count;
   final String note;
 
-
+  String get display_name => displayName;
+  String get avatar => avatarUrl;
+  String get header => headerUrl;
   Account(
       {required this.id,
         required this.username,

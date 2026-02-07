@@ -39,26 +39,21 @@ class _TimelineTabsState extends State<Timeline> with TickerProviderStateMixin {
     return account = currentAccount;
   }
 
-  /// If called, requests a new page of statuses from the Mastodon API.
-  Future<void> _fetchPage(String? lastStatusId, String typeTimeLine) async {
-    try {
-      final List<Status> newStatuses = await widget.apiService
-          .getStatusList(lastStatusId, _pageSize, typeTimeLine);
-      final isLastPage = newStatuses.length < _pageSize;
-      if (isLastPage) {
-        _pagingController.appendLastPage(newStatuses);
-      } else {
-        final nextPageKey = newStatuses.last.id;
-        _pagingController.appendPage(newStatuses, nextPageKey);
-      }
-    } catch (error) {
-      _pagingController.error = error;
-    }
-  }
-
-  final PagingController<String?, Status> _pagingController = PagingController(
-    firstPageKey: null,
-    invisibleItemsThreshold: 10,
+  late final PagingController<String?, Status> _pagingController = PagingController(
+    getNextPageKey: (state) {
+      if ((state.pages ?? []).isEmpty) return "";
+      final lastPage = state.pages!.last;
+      if (lastPage.length < _pageSize) return null;
+      return lastPage.last.id;
+    },
+    fetchPage: (pageKey) async {
+       try {
+         final key = (pageKey == "" || pageKey == null) ? null : pageKey;
+         return await widget.apiService.getStatusList(key, _pageSize, widget.typeTimeLine);
+       } catch (error) {
+          rethrow;
+       }
+    },
   );
 
   Future<bool> _onWillPop() async {
@@ -99,10 +94,6 @@ class _TimelineTabsState extends State<Timeline> with TickerProviderStateMixin {
     final curvedAnimation =
         CurvedAnimation(curve: Curves.easeInOut, parent: _animationController);
     _animation = Tween<double>(begin: 0, end: 1).animate(curvedAnimation);
-
-    _pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(pageKey, typeTimeLine);
-    });
     super.initState();
   }
 
@@ -115,33 +106,77 @@ class _TimelineTabsState extends State<Timeline> with TickerProviderStateMixin {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: BoxDecoration(
-                gradient: LinearGradient(
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
-              colors: [
-                Colors.lightBlue,
-                Colors.red.shade900,
-                Colors.blue.shade800,
-              ],
-            )),
+                color: Theme.of(context).scaffoldBackgroundColor,
+                image: const DecorationImage(
+                  image: NetworkImage("https://img.freepik.com/free-vector/dark-hexagonal-background-with-gradient-color_79603-1409.jpg"), // Hex grid pattern
+                  fit: BoxFit.cover,
+                  opacity: 0.2, // Subtle background texture
+                ),
+            ),
             child: Scaffold(
                 backgroundColor: Colors.transparent,
                 drawer: NavBar(apiService: widget.apiService),
-                // appBar: HeaderWidget(apiService: widget.apiService),
+                // AppBar removed for full-screen immersive experience
                 extendBody: true,
-                body: RefreshIndicator(
-                  backgroundColor: Colors.yellowAccent,
-                  onRefresh: () => Future.sync(_pagingController.refresh),
-                  child: PagedListView<String?, Status>(
-                    pagingController: _pagingController,
-                    physics: const ClampingScrollPhysics(),
-                    builderDelegate: PagedChildBuilderDelegate<Status>(
-                      itemBuilder: (context, item, index) => StatusCard(
-                        item,
-                        apiService: widget.apiService,
+                body: Builder(
+                  builder: (BuildContext scaffoldContext) {
+                    return GestureDetector(
+                      onHorizontalDragStart: (details) {
+                        // Only open drawer if swipe starts from left edge (first 50px)
+                        if (details.globalPosition.dx < 50) {
+                          Scaffold.of(scaffoldContext).openDrawer();
+                        }
+                      },
+                      behavior: HitTestBehavior.translucent,
+                      child: Stack(
+                        children: [
+                          // Main Content
+                          RefreshIndicator(
+                            backgroundColor: Colors.yellowAccent,
+                            onRefresh: () => Future.sync(_pagingController.refresh),
+                            child: ValueListenableBuilder<PagingState<String?, Status>>(
+                              valueListenable: _pagingController,
+                              builder: (context, state, child) => PagedListView<String?, Status>(
+                                state: state,
+                                fetchNextPage: _pagingController.fetchNextPage,
+                                physics: const ClampingScrollPhysics(),
+                                builderDelegate: PagedChildBuilderDelegate<Status>(
+                                  itemBuilder: (context, item, index) => StatusCard(
+                                    item,
+                                    apiService: widget.apiService,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          
+                          // Floating Menu Button (Top-Left)
+                          Positioned(
+                            top: 40,
+                            left: 16,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF101010).withOpacity(0.8),
+                                border: Border.all(color: const Color(0xFF00F3FF), width: 1.5),
+                                borderRadius: BorderRadius.circular(8),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: const Color(0xFF00F3FF).withOpacity(0.5),
+                                    blurRadius: 10,
+                                    spreadRadius: 0,
+                                  )
+                                ],
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.menu, color: Color(0xFF00F3FF), size: 28),
+                                onPressed: () => Scaffold.of(scaffoldContext).openDrawer(),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
+                    );
+                  }
                 ),
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.endFloat,

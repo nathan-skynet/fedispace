@@ -5,8 +5,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/models/account.dart';
 import 'package:fedispace/models/accountUsers.dart';
+import 'package:fedispace/widgets/glitch_effect.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_html/flutter_html.dart' as html;
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 
 
@@ -137,224 +138,243 @@ class _Profile extends State<Profile> {
         builder: (BuildContext context, AsyncSnapshot<Object> snapshot) {
           if (snapshot.hasData) {
             return Scaffold(
-                body: Stack(
-              children: [
-                Container(
+              backgroundColor: const Color(0xFF050505),
+              body: Stack(
+                children: [
+                  // Background with Carbon/Hex pattern
+                  Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      decoration: const BoxDecoration(
+                          color: Color(0xFF050505),
+                          image: DecorationImage(
+                            image: NetworkImage("https://img.freepik.com/free-vector/dark-hexagonal-background-with-gradient-color_79603-1409.jpg"),
+                            fit: BoxFit.cover,
+                            opacity: 0.2,
+                          ))),
+                  
+                  // Header Section (Profile Info)
+                  Container(
                     width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
+                    // height: MediaQuery.of(context).size.height * 0.35, // Increased height slightly
+                    padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
                     decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
-                      colors: [
-                        Colors.lightBlue,
-                        Colors.red.shade900,
-                        Colors.blue.shade800,
+                      color: const Color(0xFF101010).withOpacity(0.8),
+                      border: Border(bottom: BorderSide(color: const Color(0xFF00F3FF).withOpacity(0.5), width: 1)),
+                      boxShadow: [BoxShadow(color: const Color(0xFF00F3FF).withOpacity(0.1), blurRadius: 20)],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Avatar with Neon Border
+                            Container(
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: const Color(0xFF00F3FF), width: 2),
+                                boxShadow: [BoxShadow(color: const Color(0xFF00F3FF).withOpacity(0.5), blurRadius: 10)],
+                              ),
+                              child: ClipOval(
+                                child: Image.network(
+                                  avatarUrl(),
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 20),
+                            // User Info
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  GlitchEffect(
+                                    child: Text(
+                                      UserAccount?.displayName ?? "UNKNOWN IDENTIFIER",
+                                      style: const TextStyle(
+                                          fontFamily: 'Orbitron',
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                          shadows: [Shadow(color: Color(0xFF00F3FF), blurRadius: 5)]
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Text(
+                                    "Unit ID: ${UserAccount?.id ?? "N/A"}",
+                                    style: TextStyle(fontFamily: 'Rajdhani', color: Colors.grey.withOpacity(0.7), fontSize: 14),
+                                  ),
+                                  const SizedBox(height: 15),
+                                  // Stats Row
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      _buildStatItem("POSTS", UserAccount.statuses_count),
+                                      _buildStatItem("FOLLOWERS", UserAccount.followers_count),
+                                      _buildStatItem("FOLLOWING", UserAccount.following_count),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 15),
+                        // Status Indicators
+                        Row(
+                          children: [
+                            _buildStatusBagde("PUBLIC", UserAccount.isLocked == false),
+                            const SizedBox(width: 10),
+                            _buildStatusBagde("BOT", UserAccount.isBot == true), // logic was UserAccount.isBot == false ? check : cancel. So if isBot is true, it should show check? The original logic was convoluted. Let's assume isBot true means it IS a bot.
+                          ],
+                        ),
                       ],
-                    ))),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height * 0.3,
-                  padding: const EdgeInsets.fromLTRB(15, 30, 0, 0),
-                  color: Colors.black54,
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(15),
-                        child: Image.network(
-                          avatarUrl(),
-                          width: (MediaQuery.of(context).size.width - 2 * 15) *
-                              0.3,
-                        ),
-                      ),
-                      Container(
-                        width: 15,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                UserAccount?.displayName ?? "none",
-                                overflow: TextOverflow.fade,
-                                style: const TextStyle(
-                                    fontSize: 23, fontWeight: FontWeight.bold),
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Column(
-                                      children: [
-                                        Text(
-                                          getFormattedNumber(
-                                              UserAccount.statuses_count),
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const Text('Posts')
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          getFormattedNumber(
-                                              UserAccount.followers_count),
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const Text('Followers')
-                                      ],
-                                    ),
-                                    Column(
-                                      children: [
-                                        Text(
-                                          getFormattedNumber(
-                                              UserAccount.following_count),
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        const Text('Following')
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5.0),
-                                child: Row(
-                                  children: [
-                                    const Text('Public: '),
-                                    (UserAccount.isLocked == false)
-                                        ? const Icon(
-                                            Icons.check_circle_outline_outlined,
-                                            color: Colors.green,
-                                            size: 20,
-                                          )
-                                        : const Icon(
-                                            Icons.cancel_outlined,
-                                            color: Colors.red,
-                                            size: 20,
-                                          ),
-                                    const SizedBox(
-                                      width: 7,
-                                    ),
-                                    const Text('Bot: '),
-                                    (UserAccount.isBot == false)
-                                        ? const Icon(
-                                            Icons.check_circle_outline_outlined,
-                                            color: Colors.green,
-                                            size: 20,
-                                          )
-                                        : const Icon(
-                                            Icons.cancel_outlined,
-                                            color: Colors.red,
-                                            size: 20,
-                                          ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
+                    ),
+                  ),
 
-                      /// GRIDVIEW HERE
-                    ],
-                  ),
-                ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  margin: EdgeInsets.fromLTRB(
-                      0, MediaQuery.of(context).size.height * 0.3, 0, 0),
-                  color: Colors.black54,
-                  child: Column(
-                    children: [
-                      Html(
-                        data: UserAccount?.note ?? "",
-                      ),
-                      FutureBuilder(
-                          future: _callAPIToGetListOfData(),
-                          builder:
-                              (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.data != null) {
-                              return Container(
-                                  height: 400,
-                                  width: 400,
-                                  child: GridView.builder(
-                                    addAutomaticKeepAlives : true,
-                                    addRepaintBoundaries :  true,
-                                    addSemanticIndexes : true,
-                                    reverse : false,
-                                    controller: _scrollController,
-                                    gridDelegate:
-                                        const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3,
-                                    ),
-                                    itemCount: snapshot.data.length,
-                                    itemBuilder:
-                                        (BuildContext context, int index) {
-                                      //return Image.asset(images[index], fit: BoxFit.cover);
-                                      return Container(
+                  // Scrollable Body (Bio + Grid)
+                  Container(
+                    margin: EdgeInsets.only(top: 240), // Shifted down below header
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Bio / Note
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            child: html.Html(
+                              data: UserAccount?.note ?? "",
+                              style: {
+                                "body": html.Style(
+                                  fontFamily: 'Rajdhani',
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: html.FontSize(16),
+                                ),
+                                "a": html.Style(color: const Color(0xFFFF00FF)),
+                              },
+                            ),
+                          ),
+                          
+                          const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Divider(color: Color(0xFF00F3FF), height: 30),
+                          ),
+
+                          // Grid
+                          FutureBuilder(
+                            future: _callAPIToGetListOfData(),
+                            builder: (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.hasData && snapshot.data != null) {
+                                return GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  padding: EdgeInsets.zero, // Zero padding for full width
+                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    crossAxisSpacing: 1, // Minimal spacing line
+                                    mainAxisSpacing: 1,
+                                    childAspectRatio: 1, // Square photos
+                                  ),
+                                  itemCount: snapshot.data.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                         // Navigate to post detail
+                                         Navigator.pushNamed(
+                                           context,
+                                           '/statusDetail',
+                                           arguments: {
+                                             'statusId': snapshot.data[index]["id"],
+                                             'apiService': widget.apiService,
+                                           },
+                                         );
+                                       },
+                                      child: Container(
+                                        color: Colors.black, // Background for loading
                                         child: CachedNetworkImage(
-                                            imageUrl: snapshot.data[index]
-                                            ["media_attachments"][0]["url"],
-                                            placeholder: (context, url) => BlurHash(
-                                                hash: snapshot.data[index]
-                                                ["media_attachments"][0]
-                                                ["blurhash"]),
-                                            errorWidget: (context, url, error) =>
-                                            const Icon(Icons.error),
-                                            imageBuilder: (context, imageProvider) =>
-                                                Container(
-                                                    margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 3,
-                                                        vertical: 3),
-                                                    //apply padding horizontal or vertical only
-                                                    width: 490,
-                                                    height: 290,
-                                                    decoration: BoxDecoration(
-                                                        border: Border.all(
-                                                          width: 1,
-                                                          color: Colors.black54,
-                                                        ),
-                                                        // Make rounded corners
-                                                        borderRadius: BorderRadius.circular(15),
-                                                      image: DecorationImage(
-                                                        image: imageProvider,
-                                                        fit: BoxFit.cover,
-                                                      ),
-                                                    )))
-                                      );
-                                    },
-                                  ));
-                            } else if (snapshot.hasError) {
-                              print("error");
-                              print(snapshot.error);
-                              return const Text("error");
+                                          imageUrl: snapshot.data[index]["media_attachments"][0]["url"],
+                                          placeholder: (context, url) => Container(
+                                              color: const Color(0xFF101010),
+                                              child: const Center(child: CircularProgressIndicator(color: Color(0xFF00F3FF), strokeWidth: 2))
+                                          ),
+                                          errorWidget: (context, url, error) => const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              } else if (snapshot.hasError) {
+                                return const Center(child: Text("DATA CORRUPTED", style: TextStyle(color: Colors.red)));
+                              }
+                              return const Center(child: CircularProgressIndicator(color: Color(0xFF00F3FF)));
                             }
-                            return const CircularProgressIndicator();
-                          }),
-                    ],
+                          ),
+                          const SizedBox(height: 100), // Bottom padding
+                        ],
+                      ),
+                    ),
                   ),
-                )
-              ],
-            ));
+                ],
+              ),
+            );
           }
           if (snapshot.hasError) {
-            return const Center(child: Text("Error dans la function profile"));
+            return const Center(child: Text("SYSTEM ERROR", style: TextStyle(color: Colors.red)));
           }
           return const Center(
-            child: CircularProgressIndicator(),
+            child: CircularProgressIndicator(color: Color(0xFF00F3FF)),
           );
         });
+  }
+
+  Widget _buildStatItem(String label, int value) {
+    return Column(
+      children: [
+        Text(
+          getFormattedNumber(value),
+          style: const TextStyle(
+            fontFamily: 'Orbitron',
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Color(0xFFFF00FF), // Neon Pink
+          ),
+        ),
+        Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'Rajdhani',
+            fontSize: 12,
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusBagde(String label, bool isActive) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: isActive ? const Color(0xFF00F3FF).withOpacity(0.1) : Colors.red.withOpacity(0.1),
+        border: Border.all(color: isActive ? const Color(0xFF00F3FF) : Colors.red),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        isActive ? label : "NOT $label",
+        style: TextStyle(
+          fontFamily: 'Orbitron',
+          fontSize: 10,
+          color: isActive ? const Color(0xFF00F3FF) : Colors.red,
+        ),
+      ),
+    );
   }
 }

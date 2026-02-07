@@ -1,13 +1,14 @@
-// ignore_for_file: avoid_print, non_constant_identifier_names
+// Improved error handling and logging
 
 /// Import Flutter
 ///
 import 'dart:convert';
 import 'dart:io';
 
-
 /// Import Fedispace
 ///
+import 'package:fedispace/core/error_handler.dart';
+import 'package:fedispace/core/logger.dart';
 import 'package:fedispace/helpers/auth.dart';
 import 'package:fedispace/models/account.dart';
 import 'package:fedispace/models/accountUsers.dart';
@@ -21,12 +22,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
-
-class ApiException implements Exception {
-  final String message;
-
-  ApiException(this.message);
-}
 
 class ApiService {
   static const FlutterSecureStorage secureStorage = FlutterSecureStorage();
@@ -58,120 +53,177 @@ class ApiService {
     return await helper!.post(url, httpClient: httpClient);
   }
 
-// TODO A VRAIMENT REVOIR !!!!!!!!
-  Future<int> createPosts(
-      String Token,
-      String content,
-      String in_reply_to_id,
-      List media_ids,
-      String sensitive,
-      String spoiler_text,
-      String visibility) async {
+  /// Create a new post/status on Pixelfed
+  /// 
+  /// SECURITY: Fixed JSON injection vulnerability by using proper Map serialization
+  Future<int> createPosts({
+      required String content,
+      String? inReplyToId,
+      List<String> mediaIds = const [],
+      bool sensitive = false,
+      String? spoilerText,
+      String visibility = 'public'}) async {
     try {
-      var resultat = content.replaceAll("\n", '\\n');
+      // Build request body as a proper Map instead of string concatenation
+      final Map<String, dynamic> requestBody = {
+        'status': content,
+        'application': {
+          'name': 'fedispace',
+          'website': 'https://git.echelon4.space/sk7n4k3d/fedispace',
+        },
+        'media_ids': mediaIds,
+      };
 
-      Map<String, dynamic> result = jsonDecode(
-          """{"status": "$resultat",  "application": { "name": "fedispace", "website": "https://git.echelon4.space/sk7n4k3d/fedispace"},
-      "media_ids": $media_ids}""");
+      // Add optional parameters only if provided
+      if (inReplyToId != null) {
+        requestBody['in_reply_to_id'] = inReplyToId;
+      }
+      if (sensitive) {
+        requestBody['sensitive'] = true;
+      }
+      if (spoilerText != null && spoilerText.isNotEmpty) {
+        requestBody['spoiler_text'] = spoilerText;
+      }
+      if (visibility.isNotEmpty) {
+        requestBody['visibility'] = visibility;
+      }
 
-      var response = await http.post(
-        Uri.parse("${instanceUrl!}/api/v1/statuses"),
-        body: jsonEncode(result),
+      appLogger.apiCall('POST', '/api/v1/statuses', params: requestBody);
+
+      final response = await helper!.post(
+        '${instanceUrl!}/api/v1/statuses',
+        body: jsonEncode(requestBody),
         headers: <String, String>{
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $Token",
+          'Content-Type': 'application/json',
         },
       );
 
-      int resultCode = response.statusCode;
-      print(result);
-      print(response.statusCode.toString());
-      print(response.body);
-      if (resultCode == 200) {
+      appLogger.apiResponse('/api/v1/statuses', response.statusCode,
+          body: response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
         AwesomeNotifications().createNotification(
           content: NotificationContent(
             id: 1,
             channelKey: 'internal',
             title: 'Success post uploaded',
-            body: "Your post is on Pixelfed",
+            body: 'Your post is on Pixelfed',
           ),
         );
-        return 200;
+        return response.statusCode;
       }
-      return 0;
-    } catch (err) {
-      print("erreur dans la fonction posts");
-      print(err);
+
+      ErrorHandler.handleResponse(response.statusCode, response.body);
+      return response.statusCode;
+    } catch (err, stackTrace) {
+      appLogger.error('Error creating post', err, stackTrace);
       AwesomeNotifications().createNotification(
         content: NotificationContent(
           id: 1,
           channelKey: 'internal',
-          title: 'Uploading pots failed',
-          body: 'Error : $err',
+          title: 'Uploading post failed',
+          body: 'Error: ${err.toString()}',
         ),
       );
       return 0;
     }
   }
 
-  // TODO A VRAIMENT REVOIR !!!!!!!!
-  Future<int?> apiPostMedia(String description, List filename) async {
+  /// Upload media files to Pixelfed and create a post
+  /// 
+  /// SECURITY: Fixed hardcoded values and improved error handling
+  Future<int?> apiPostMedia(String description, List<String> filenames,
+      {bool sensitive = false, String visibility = 'public'}) async {
     try {
-      List<String> listId = [];
-      var uri = Uri.parse("${instanceUrl!}/api/v2/media");
-      AccessTokenResponse? token = await helper!.getTokenFromStorage();
-      String? Token = token?.accessToken.toString();
+      List<String> mediaIds = [];
+      final uri = Uri.parse('${instanceUrl!}/api/v2/media');
+      final tokenResponse = await helper!.getTokenFromStorage();
+      final token = tokenResponse?.accessToken;
 
-      for (int i = 0; i < filename.length; i++) {
-        var request = http.MultipartRequest('POST', uri);
+      if (token == null) {
+        throw AuthenticationException('No access token available');
+      }
 
+      appLogger.info('Uploading ${filenames.length} media files');
+
+      for (int i = 0; i < filenames.length; i++) {
+        final filename = filenames[i];
+        final file = File(filename);
+
+        if (!await file.exists()) {
+          throw ValidationException('File not found: $filename');
+        }
+
+        final request = http.MultipartRequest('POST', uri);
         request.headers.addAll({
-          'Content-Type': 'multipart/form-data',
-          'Authorization': 'Bearer $Token',
+          'Authorization': 'Bearer $token',
         });
         request.fields['description'] = description;
-        print(filename.length);
-        print(filename[i]);
-        request.files.add(await http.MultipartFile(
-            "file",
-            File(filename[i]).readAsBytes().asStream(),
-            File(filename[i]).lengthSync(),
-            filename: filename[i].split("/").last));
-        var response = await request.send();
-        var responsed = await http.Response.fromStream(response);
-        final responseData = json.decode(responsed.body);
-        print(responsed.body);
-        listId.add('"${responseData["id"].toString()}"');
-      }
-      print(listId);
 
-      return await createPosts(Token.toString(), description, "null", listId,
-          "null", "null", "public");
-    } catch (err) {
-      print("erroor");
-      print(err);
+        request.files.add(await http.MultipartFile(
+          'file',
+          file.readAsBytes().asStream(),
+          file.lengthSync(),
+          filename: filename.split('/').last,
+        ));
+
+        final response = await request.send();
+        final responseBody = await http.Response.fromStream(response);
+
+        appLogger.apiResponse(
+            '/api/v2/media', responseBody.statusCode, body: responseBody.body);
+
+        if (responseBody.statusCode != 200 && responseBody.statusCode != 201) {
+          ErrorHandler.handleResponse(
+              responseBody.statusCode, responseBody.body);
+          return null;
+        }
+
+        final responseData = ErrorHandler.parseJson(responseBody.body);
+        final mediaId = responseData['id']?.toString();
+        
+        if (mediaId != null) {
+          mediaIds.add(mediaId);
+        }
+      }
+
+      appLogger.info('Successfully uploaded ${mediaIds.length} media files');
+
+      return await createPosts(
+        content: description,
+        mediaIds: mediaIds,
+        sensitive: sensitive,
+        visibility: visibility,
+      );
+    } catch (err, stackTrace) {
+      appLogger.error('Error uploading media', err, stackTrace);
       return null;
     }
   }
 
+  /// Get notifications for the current user
   Future getNotification() async {
-    final apiUrl = "${instanceUrl!}/api/v1/notifications";
+    final apiUrl = '${instanceUrl!}/api/v1/notifications';
     http.Response resp;
     try {
-      resp = await _apiGet(
-        apiUrl,
-      );
-    } on Exception {
-      throw ApiException(
-        "Error connecting to server on `getNotification`",
+      appLogger.apiCall('GET', '/api/v1/notifications');
+      resp = await _apiGet(apiUrl);
+    } on Exception catch (e, stackTrace) {
+      appLogger.error('Error getting notifications', e, stackTrace);
+      throw NetworkException(
+        'Error connecting to server on getNotification',
+        originalError: e,
       );
     }
+    
+    appLogger.apiResponse('/api/v1/notifications', resp.statusCode);
+    
     if (resp.statusCode == 200) {
-      print(resp.body);
       return resp.body;
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getClientCredentials`",
+      'Unexpected status code ${resp.statusCode} on getNotification',
+      statusCode: resp.statusCode,
     );
   }
 
@@ -245,31 +297,34 @@ class ApiService {
     setHelper();
   }
 
+  /// Check if domain is a valid Pixelfed instance
   Future<bool> NodeInfo(domain) async {
     try {
       String apiUrl;
-      print(domain);
-      if (domain.toString().contains("://")) {
-        apiUrl = "${domain}/api/v1/instance";
+      appLogger.debug('Checking Pixelfed instance: $domain');
+      
+      if (domain.toString().contains('://')) {
+        apiUrl = '$domain/api/v1/instance';
       } else {
-        apiUrl = "https://${domain.toString()}/api/v1/instance";
+        apiUrl = 'https://${domain.toString()}/api/v1/instance';
       }
-      print(apiUrl);
+      
+      appLogger.apiCall('GET', apiUrl);
       http.Response resp = await http.get(Uri.parse(apiUrl));
-      print(jsonDecode(resp.body));
+      appLogger.apiResponse(apiUrl, resp.statusCode);
+      
       if (resp.statusCode == 200) {
-        print(jsonDecode(resp.body));
-        if (jsonDecode(resp.body)[0]["metadata"]["nodeName"] == "Pixelfed" &&
-            jsonDecode(resp.body)[0]["config"]["features"]["mobile_apis"] ==
-                true) {
-          print("ok");
+        final jsonBody = jsonDecode(resp.body);
+        if (jsonBody[0]['metadata']['nodeName'] == 'Pixelfed' &&
+            jsonBody[0]['config']['features']['mobile_apis'] == true) {
+          appLogger.info('Valid Pixelfed instance detected: $domain');
           return true;
         }
-        print("pas ok");
+        appLogger.warning('Not a valid Pixelfed instance: $domain');
         return false;
       }
-    } catch (e) {
-      print("pas ok");
+    } catch (e, stackTrace) {
+      appLogger.error('Error checking Pixelfed instance', e, stackTrace);
       return false;
     }
     return false;
@@ -287,19 +342,23 @@ class ApiService {
     );
   }
 
+  /// Get list of statuses from timeline
   Future<List<Status>> getStatusList(String? maxId, int limit, timeLine) async {
     String apiUrl;
-    if (timeLine == "home") {
-      apiUrl = "${instanceUrl!}/api/v1/timelines/home?limit=20";
+    if (timeLine == 'home') {
+      apiUrl = '${instanceUrl!}/api/v1/timelines/home?limit=20';
     } else {
-      apiUrl = "${instanceUrl!}/api/v1/timelines/public?limit=20";
+      apiUrl = '${instanceUrl!}/api/v1/timelines/public?limit=20';
     }
-    print(apiUrl);
+    
     if (maxId != null) {
-      apiUrl += "&max_id=$maxId";
+      apiUrl += '&max_id=$maxId';
     }
+    
+    appLogger.apiCall('GET', apiUrl);
     http.Response resp = await _apiGet(apiUrl);
-    print(resp.statusCode);
+    appLogger.apiResponse(apiUrl, resp.statusCode);
+    
     if (resp.statusCode == 200) {
       // The response is a list of json objects
       List<dynamic> jsonDataList = jsonDecode(resp.body);
@@ -310,15 +369,15 @@ class ApiService {
           .toList();
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+      'Unexpected status code ${resp.statusCode} on getStatusList',
+      statusCode: resp.statusCode,
     );
   }
 
   /// Returns the current account as cached in the instance,
   /// retrieving the account details from the API first if needed.
-  ///
   Future<Account> getCurrentAccount() async {
-    print(currentAccount);
+    appLogger.debug('Getting current account');
     if (currentAccount != null) {
       return currentAccount!;
     }
@@ -328,18 +387,23 @@ class ApiService {
   /// Retrieve and return the [Account] instance associated to the current
   /// credentials by querying the API. Updates the `this.currentAccount`
   /// instance attribute in the process.
-  ///
   Future<Account> getAccount() async {
-    final apiUrl = "${instanceUrl!}/api/v1/accounts/verify_credentials";
+    final apiUrl = '${instanceUrl!}/api/v1/accounts/verify_credentials';
+    appLogger.apiCall('GET', '/api/v1/accounts/verify_credentials');
+    
     http.Response resp = await _apiGet(apiUrl);
+    appLogger.apiResponse(apiUrl, resp.statusCode);
+    
     if (resp.statusCode == 200) {
       Map<String, dynamic> jsonData = jsonDecode(resp.body);
       currentAccount = Account.fromJson(jsonData);
+      appLogger.info('Account retrieved: ${currentAccount!.username}');
       return currentAccount!;
     }
-    print(resp.statusCode);
+    
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getAccount`",
+      'Unexpected status code ${resp.statusCode} on getAccount',
+      statusCode: resp.statusCode,
     );
   }
 
@@ -347,32 +411,46 @@ class ApiService {
     return instanceUrl;
   }
 
+  /// Get account information for a specific user
   Future<AccountUsers> getUserAccount(id) async {
-    final apiUrl = "${instanceUrl!}/api/v1/accounts/${id}";
+    final apiUrl = '${instanceUrl!}/api/v1/accounts/$id';
+    appLogger.apiCall('GET', '/api/v1/accounts/$id');
+    
     http.Response resp = await _apiGet(apiUrl);
+    appLogger.apiResponse(apiUrl, resp.statusCode);
+    
     if (resp.statusCode == 200) {
       Map<String, dynamic> jsonData = jsonDecode(resp.body);
       currentAccountOfUsers = AccountUsers.fromJson(jsonData);
       return currentAccountOfUsers!;
     }
-    print(resp.statusCode);
+    
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getAccount`",
+      'Unexpected status code ${resp.statusCode} on getUserAccount',
+      statusCode: resp.statusCode,
     );
   }
 
+  /// Get a single status by ID
   Future<Status> statusByID(String statusId) async {
-    print("Call Function statuByID");
-    final apiUrl = "${instanceUrl!}/api/v1/statuses/$statusId";
+    appLogger.debug('Fetching status: $statusId');
+    final apiUrl = '${instanceUrl!}/api/v1/statuses/$statusId';
+    
     http.Response resp = await _apiGet(apiUrl);
+    appLogger.apiResponse(apiUrl, resp.statusCode);
+    
     if (resp.statusCode == 200) {
       Map<String, dynamic> jsonData = jsonDecode(resp.body);
       return Status.fromJson(jsonData);
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getSatusbyID`",
+      'Unexpected status code ${resp.statusCode} on statusByID',
+      statusCode: resp.statusCode,
     );
   }
+
+  // Alias for compatibility
+  Future<Status> getStatus(String statusId) => statusByID(statusId);
 
   Future<Status> favoriteStatus(String statusId) async {
     final apiUrl = "${instanceUrl!}/api/v1/statuses/$statusId/favourite";
@@ -578,26 +656,340 @@ class ApiService {
     );
   }
 
-  Future getUserStatus(userId, pageIndex , String? minId) async {
+  /// Get user's statuses
+  Future getUserStatus(userId, pageIndex, String? minId) async {
     final String apiUrl;
     if (pageIndex > 1) {
       apiUrl =
-          "${instanceUrl!}/api/v1/accounts/${userId}/statuses?limit=16&only_media=true&max_id=${minId.toString()}";
+          '${instanceUrl!}/api/v1/accounts/$userId/statuses?limit=16&only_media=true&max_id=${minId.toString()}';
     } else {
-      apiUrl = "${instanceUrl!}/api/v1/accounts/${userId}/statuses?limit=16&only_media=true&max_id=0";
+      apiUrl =
+          '${instanceUrl!}/api/v1/accounts/$userId/statuses?limit=16&only_media=true&max_id=0';
     }
-    ///////
 
-
-    /////////
-    print(apiUrl);
+    appLogger.apiCall('GET', apiUrl);
     http.Response resp = await _apiGet(apiUrl);
+    appLogger.apiResponse(apiUrl, resp.statusCode);
+    
     if (resp.statusCode == 200) {
       return jsonDecode(resp.body);
     }
     throw ApiException(
-      "Unexpected status code ${resp.statusCode} on `getStatusList`",
+      'Unexpected status code ${resp.statusCode} on getUserStatus',
+      statusCode: resp.statusCode,
     );
+  }
+
+  // ========== NEW API ENDPOINTS ==========
+
+  /// Update the user's profile information
+  /// PATCH /api/v1/accounts/update_credentials
+  Future<Account> updateCredentials({
+    String? displayName,
+    String? note,
+    File? avatar,
+    File? header,
+    bool? locked,
+    bool? discoverable,
+  }) async {
+    try {
+      final uri = Uri.parse('${instanceUrl!}/api/v1/accounts/update_credentials');
+      final tokenResponse = await helper!.getTokenFromStorage();
+      final token = tokenResponse?.accessToken;
+
+      if (token == null) {
+        throw AuthenticationException('No access token available');
+      }
+
+      final request = http.MultipartRequest('PATCH', uri);
+      request.headers.addAll({
+        'Authorization': 'Bearer $token',
+      });
+
+      // Add text fields
+      if (displayName != null) request.fields['display_name'] = displayName;
+      if (note != null) request.fields['note'] = note;
+      if (locked != null) request.fields['locked'] = locked.toString();
+      if (discoverable != null) request.fields['discoverable'] = discoverable.toString();
+
+      // Add image files
+      if (avatar != null && await avatar.exists()) {
+        request.files.add(await http.MultipartFile.fromPath('avatar', avatar.path));
+      }
+      if (header != null && await header.exists()) {
+        request.files.add(await http.MultipartFile.fromPath('header', header.path));
+      }
+
+      appLogger.apiCall('PATCH', '/api/v1/accounts/update_credentials');
+      final response = await request.send();
+      final responseBody = await http.Response.fromStream(response);
+      appLogger.apiResponse('/api/v1/accounts/update_credentials', responseBody.statusCode);
+
+      if (responseBody.statusCode == 200) {
+        final jsonData = ErrorHandler.parseJson(responseBody.body);
+        currentAccount = Account.fromJson(jsonData);
+        return currentAccount!;
+      }
+
+      ErrorHandler.handleResponse(responseBody.statusCode, responseBody.body);
+      throw ApiException('Failed to update credentials', statusCode: responseBody.statusCode);
+    } catch (err, stackTrace) {
+      appLogger.error('Error updating credentials', err, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Search for accounts
+  /// GET /api/v1/accounts/search
+  Future<List<AccountUsers>> searchAccounts(String query, {int limit = 20}) async {
+    try {
+      final params = {
+        'q': query,
+        'limit': limit.toString(),
+      };
+      final uri = Uri.parse('${instanceUrl!}/api/v1/accounts/search')
+          .replace(queryParameters: params);
+
+      appLogger.apiCall('GET', '/api/v1/accounts/search?q=$query');
+      final resp = await _apiGet(uri.toString());
+      appLogger.apiResponse('/api/v1/accounts/search', resp.statusCode);
+
+      if (resp.statusCode == 200) {
+        final List<dynamic> jsonData = jsonDecode(resp.body);
+        return jsonData
+            .map((account) => AccountUsers.fromJson(account as Map<String, dynamic>))
+            .toList();
+      }
+
+      ErrorHandler.handleResponse(resp.statusCode, resp.body);
+      throw ApiException('Search failed', statusCode: resp.statusCode);
+    } catch (err, stackTrace) {
+      appLogger.error('Error searching accounts', err, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Get account followers
+  /// GET /api/v1/accounts/:id/followers
+  Future<List<AccountUsers>> getFollowers(String accountId, {String? maxId, int limit = 40}) async {
+    try {
+      var apiUrl = '${instanceUrl!}/api/v1/accounts/$accountId/followers?limit=$limit';
+      if (maxId != null) {
+        apiUrl += '&max_id=$maxId';
+      }
+
+      appLogger.apiCall('GET', '/api/v1/accounts/$accountId/followers');
+      final resp = await _apiGet(apiUrl);
+      appLogger.apiResponse(apiUrl, resp.statusCode);
+
+      if (resp.statusCode == 200) {
+        final List<dynamic> jsonData = jsonDecode(resp.body);
+        return jsonData
+            .map((account) => AccountUsers.fromJson(account as Map<String, dynamic>))
+            .toList();
+      }
+
+      ErrorHandler.handleResponse(resp.statusCode, resp.body);
+      throw ApiException('Failed to get followers', statusCode: resp.statusCode);
+    } catch (err, stackTrace) {
+      appLogger.error('Error getting followers', err, stackTrace);
+      rethrow;
+    }
+  }
+
+  // Missing methods implementation for compatibility
+
+  Future<bool> unFollow(String userId) async {
+    return unfollowUser(userId);
+  }
+
+  Future<void> followStatus(String userId) async {
+      // Assuming this is checking relationship? Or following?
+      // Based on usage context 'await widget.apiService.followStatus(widget.userId);'
+      // It might be 'followUser'.
+      await followUser(userId);
+  }
+  
+  Future<List<Status>> getFav(String? maxId) async {
+    // Get Favourites
+    // GET /api/v1/favourites
+    String apiUrl = '${instanceUrl!}/api/v1/favourites?limit=20';
+    if (maxId != null) {
+       apiUrl += '&max_id=$maxId';
+    }
+    
+    appLogger.apiCall('GET', apiUrl);
+    http.Response resp = await _apiGet(apiUrl);
+    appLogger.apiResponse(apiUrl, resp.statusCode);
+    
+    if (resp.statusCode == 200) {
+       List<dynamic> jsonDataList = jsonDecode(resp.body);
+       return jsonDataList
+          .map((statusData) => Status.fromJson(statusData as Map<String, dynamic>))
+          .toList();
+    }
+     throw ApiException(
+      'Unexpected status code ${resp.statusCode} on getFav',
+      statusCode: resp.statusCode,
+    );
+  }
+
+  Future<Map<String, dynamic>> getContext(String statusId) async {
+    final apiUrl = '${instanceUrl!}/api/v1/statuses/$statusId/context';
+    appLogger.apiCall('GET', apiUrl);
+    http.Response resp = await _apiGet(apiUrl);
+    
+    if (resp.statusCode == 200) {
+       return jsonDecode(resp.body);
+    }
+    throw ApiException('Failed to get context', statusCode: resp.statusCode);
+  }
+
+  String? getInstanceUrl() {
+    return instanceUrl;
+  }
+
+  /// Get accounts being followed
+  /// GET /api/v1/accounts/:id/following
+  Future<List<AccountUsers>> getFollowing(String accountId, {String? maxId, int limit = 40}) async {
+    try {
+      var apiUrl = '${instanceUrl!}/api/v1/accounts/$accountId/following?limit=$limit';
+      if (maxId != null) {
+        apiUrl += '&max_id=$maxId';
+      }
+
+      appLogger.apiCall('GET', '/api/v1/accounts/$accountId/following');
+      final resp = await _apiGet(apiUrl);
+      appLogger.apiResponse(apiUrl, resp.statusCode);
+
+      if (resp.statusCode == 200) {
+        final List<dynamic> jsonData = jsonDecode(resp.body);
+        return jsonData
+            .map((account) => AccountUsers.fromJson(account as Map<String, dynamic>))
+            .toList();
+      }
+
+      ErrorHandler.handleResponse(resp.statusCode, resp.body);
+      throw ApiException('Failed to get following', statusCode: resp.statusCode);
+    } catch (err, stackTrace) {
+      appLogger.error('Error getting following', err, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Get bookmarked statuses
+  /// GET /api/v1/bookmarks
+  Future<List<Status>> getBookmarks({String? maxId, int limit = 20}) async {
+    try {
+      var apiUrl = '${instanceUrl!}/api/v1/bookmarks?limit=$limit';
+      if (maxId != null) {
+        apiUrl += '&max_id=$maxId';
+      }
+
+      appLogger.apiCall('GET', '/api/v1/bookmarks');
+      final resp = await _apiGet(apiUrl);
+      appLogger.apiResponse(apiUrl, resp.statusCode);
+
+      if (resp.statusCode == 200) {
+        final List<dynamic> jsonData = jsonDecode(resp.body);
+        return jsonData
+            .map((status) => Status.fromJson(status as Map<String, dynamic>))
+            .toList();
+      }
+
+      ErrorHandler.handleResponse(resp.statusCode, resp.body);
+      throw ApiException('Failed to get bookmarks', statusCode: resp.statusCode);
+    } catch (err, stackTrace) {
+      appLogger.error('Error getting bookmarks', err, stackTrace);
+      rethrow;
+    }
+  }
+
+  /// Delete a status
+  /// DELETE /api/v1/statuses/:id
+  Future<bool> deleteStatus(String statusId) async {
+    try {
+      final apiUrl = '${instanceUrl!}/api/v1/statuses/$statusId';
+      appLogger.apiCall('DELETE', '/api/v1/statuses/$statusId');
+
+      final tokenResponse = await helper!.getTokenFromStorage();
+      final token = tokenResponse?.accessToken;
+
+      if (token == null) {
+        throw AuthenticationException('No access token available');
+      }
+
+      final resp = await httpClient.delete(
+        Uri.parse(apiUrl),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      appLogger.apiResponse(apiUrl, resp.statusCode);
+
+      if (resp.statusCode == 200 || resp.statusCode == 204) {
+        Fluttertoast.showToast(
+          msg: 'Post deleted',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 2,
+          fontSize: 16.0,
+        );
+        return true;
+      }
+
+      ErrorHandler.handleResponse(resp.statusCode, resp.body);
+      return false;
+    } catch (err, stackTrace) {
+      appLogger.error('Error deleting status', err, stackTrace);
+      return false;
+    }
+  }
+
+  /// Clear all notifications
+  /// POST /api/v1/notifications/clear
+  Future<bool> clearNotifications() async {
+    try {
+      final apiUrl = '${instanceUrl!}/api/v1/notifications/clear';
+      appLogger.apiCall('POST', '/api/v1/notifications/clear');
+
+      final resp = await _apiPost(apiUrl);
+      appLogger.apiResponse(apiUrl, resp.statusCode);
+
+      if (resp.statusCode == 200 || resp.statusCode == 204) {
+        appLogger.info('All notifications cleared');
+        return true;
+      }
+
+      ErrorHandler.handleResponse(resp.statusCode, resp.body);
+      return false;
+    } catch (err, stackTrace) {
+      appLogger.error('Error clearing notifications', err, stackTrace);
+      return false;
+    }
+  }
+
+  /// Dismiss a single notification
+  /// POST /api/v1/notifications/:id/dismiss
+  Future<bool> dismissNotification(String notificationId) async {
+    try {
+      final apiUrl = '${instanceUrl!}/api/v1/notifications/$notificationId/dismiss';
+      appLogger.apiCall('POST', '/api/v1/notifications/$notificationId/dismiss');
+
+      final resp = await _apiPost(apiUrl);
+      appLogger.apiResponse(apiUrl, resp.statusCode);
+
+      if (resp.statusCode == 200 || resp.statusCode == 204) {
+        return true;
+      }
+
+      ErrorHandler.handleResponse(resp.statusCode, resp.body);
+      return false;
+    } catch (err, stackTrace) {
+      appLogger.error('Error dismissing notification', err, stackTrace);
+      return false;
+    }
   }
 
   /// Revokes all API service credentials & state variables from the

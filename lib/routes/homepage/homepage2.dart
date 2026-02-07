@@ -1,4 +1,5 @@
 import 'package:fedispace/core/api.dart';
+import 'package:fedispace/core/error_handler.dart';
 import 'package:fedispace/core/unifiedpush.dart';
 import 'package:fedispace/routes/homepage/inputWidget.dart';
 import 'package:flutter/material.dart';
@@ -31,8 +32,8 @@ class _Login extends State<Login> {
     /// TODO REVOIR UNIFIEDPUSH ENCORE UNE FOIS ET NOTIFICATION SERVICE
     ///
     if (Platform.isAndroid){
-      await widget.unifiedPushService.InitUnifiedPush();
-      await widget.unifiedPushService.StartUnifiedPush(context);
+      await widget.unifiedPushService.initUnifiedPush();
+      await widget.unifiedPushService.startUnifiedPush(context, widget.apiService);
     }
 
     Fluttertoast.showToast(
@@ -242,11 +243,11 @@ Widget roundedRectButton(
 }
 
 const List<Color> signInGradients = [
-  Color(0xFF0EDED2),
-  Color(0xFF03A0FE),
+  Color(0xFF00F3FF), // Neon Cyan
+  Color(0xFF0099CC),
 ];
 
 const List<Color> signUpGradients = [
-  Color(0xFFFF9945),
-  Color(0xFFFc6076),
+  Color(0xFFFF00FF), // Neon Pink
+  Color(0xFFCC00CC),
 ];

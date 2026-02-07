@@ -31,8 +31,10 @@ class _bottomWidget extends State<bottomWidget> {
         break;
 
       case 3:
+        Navigator.pushNamed(context, '/Bookmarks');
         break;
       case 4:
+        Navigator.pushNamed(context, '/Profile');
         break;
     }
   }
@@ -87,7 +89,7 @@ class _bottomWidget extends State<bottomWidget> {
                     icon: Icon(
                       FontAwesomeIcons.circlePlus,
                       size: 34,
-                      color: Colors.red,
+                      color: Color(0xFFFF00FF), // Neon Pink
                     ),
                     label: 'add'),
                 BottomNavigationBarItem(

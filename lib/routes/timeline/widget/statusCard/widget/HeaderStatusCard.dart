@@ -5,12 +5,14 @@ class HeaderStatusCard extends StatelessWidget {
   final postsAccount;
   final created_at;
   final ApiService apiService;
+  final String statusId;
 
   const HeaderStatusCard(
       {Key? key,
       required this.postsAccount,
       required this.created_at,
-      required this.apiService})
+      required this.apiService,
+      required this.statusId})
       : super(key: key);
 
   String convertToAgo(DateTime input) {
@@ -94,9 +96,24 @@ class HeaderStatusCard extends StatelessWidget {
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                       onSelected: (int index) {
                         print('index is $index');
-                        if (index == 3) {
+                        if (index == 1) {
+                          // Voir la Publication - Navigate to status detail
+                          Navigator.pushNamed(
+                            context,
+                            '/statusDetail',
+                            arguments: {
+                              'statusId': statusId,
+                              'apiService': apiService,
+                            },
+                          );
+                        } else if (index == 2) {
+                          // Voir le profil - Navigate to profile
+                          Navigator.of(context).pushNamed('/Profile', arguments: {'id': postsAccount.id});
+                        } else if (index == 3) {
+                          // Mute User
                           apiService.muteUser(postsAccount.id);
                         }
+                        // Option 4 (Supprimer) needs implementation
                       },
                       itemBuilder: (context) => [
                             const PopupMenuItem(

@@ -34,13 +34,18 @@ class NavBar extends StatelessWidget {
         builder: (BuildContext context, AsyncSnapshot<Object> snapshot) {
           if (snapshot.hasData) {
             return Container(
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF101010),
+                  borderRadius: const BorderRadius.only(
                       bottomRight: Radius.circular(40),
-                      topRight: Radius.circular(400)),
-                  boxShadow: [
+                      topRight: Radius.circular(30)), // Sharper angles
+                  border: Border.all(color: const Color(0xFF00F3FF).withOpacity(0.5), width: 1.5), // Neon Border
+                  boxShadow: const [
                     BoxShadow(
-                        color: Colors.black38, spreadRadius: 5, blurRadius: 15),
+                        color: Color(0xFF00F3FF), // Neon glow
+                        blurRadius: 10,
+                        spreadRadius: 0,
+                        blurStyle: BlurStyle.outer),
                   ],
                 ),
                 width: 200,
@@ -53,29 +58,36 @@ class NavBar extends StatelessWidget {
                         // Remove padding
                         padding: EdgeInsets.zero,
                         children: [
-                          UserAccountsDrawerHeader(
-                            accountName: Text(account?.displayName ?? "none",
-                                style: const TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.grey,
-                                )),
-                            accountEmail: Text(account?.acct ?? "none"),
-                            currentAccountPicture: CircleAvatar(
-                              child: ClipOval(
-                                child: Image.network(
-                                  avatarurl(),
-                                  fit: BoxFit.cover,
-                                  width: 90,
-                                  height: 90,
-                                ),
-                              ),
-                            ),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
                             decoration: const BoxDecoration(
-                              color: Colors.blue,
-                              image: DecorationImage(
-                                  fit: BoxFit.fill,
-                                  image: NetworkImage(
-                                      'https://img.myloview.fr/images/abstract-square-pattern-on-gradient-background-pixel-tile-backdrop-graphic-art-random-square-shapes-texture-futuristic-cover-wallpaper-banner-poster-flyer-template-stock-vector-illustration-400-183616984.jpg')),
+                              color: Color(0xFF101010),
+                              border: Border(bottom: BorderSide(color: Color(0xFF00F3FF), width: 2)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  account?.displayName ?? "UNKNOWN USER",
+                                  style: const TextStyle(
+                                    fontFamily: 'Orbitron',
+                                    fontSize: 18,
+                                    color: Color(0xFF00F3FF),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '@${account?.acct ?? "none"}',
+                                  style: const TextStyle(
+                                    fontFamily: 'Rajdhani',
+                                    fontSize:14,
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                           ListTile(
@@ -101,14 +113,16 @@ class NavBar extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 18,
                                 )),
-                            onTap: () => null,
+                            onTap: () => Navigator.pushNamed(
+                                context, '/DirectMessages'),
                           ),
-                          const ListTile(
-                            leading: Icon(FontAwesomeIcons.ccDiscover),
-                            title: Text('Discovery',
+                          ListTile(
+                            leading: const Icon(FontAwesomeIcons.ccDiscover),
+                            title: const Text('Discovery',
                                 style: TextStyle(
                                   fontSize: 18,
                                 )),
+                            onTap: () => Navigator.pushNamed(context, '/Local'),
                           ),
                           const Divider(),
                           ListTile(
@@ -117,7 +131,7 @@ class NavBar extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 18,
                                 )),
-                            onTap: () => null,
+                            onTap: () => Navigator.pushNamed(context, '/Settings'),
                           ),
                           ListTile(
                             leading:
@@ -126,7 +140,7 @@ class NavBar extends StatelessWidget {
                                 style: TextStyle(
                                   fontSize: 18,
                                 )),
-                            onTap: () => null,
+                            onTap: () => Navigator.pushNamed(context, '/Search'),
                           ),
                           const Divider(),
                           ListTile(

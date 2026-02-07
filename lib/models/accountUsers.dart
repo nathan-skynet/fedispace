@@ -30,8 +30,13 @@ class AccountUsers {
   final int  following_count;
   final int  statuses_count;
   final String note;
+  final bool? following;
 
-
+  String get display_name => displayName;
+  String get avatar => avatarUrl;
+  String get header => headerUrl;
+  bool get bot => isBot;
+  bool get locked => isLocked;
   AccountUsers(
       {required this.id,
         required this.username,
@@ -45,6 +50,7 @@ class AccountUsers {
         required this.following_count,
         required this.statuses_count,
         required this.note,
+        this.following,
       });
 
   /// Given a Json-like [Map] with information for an account,
@@ -64,6 +70,7 @@ class AccountUsers {
       following_count : data["following_count"],
       statuses_count : data["statuses_count"],
       note : data["note"],
+      following: data["following"],
     );
   }
 }

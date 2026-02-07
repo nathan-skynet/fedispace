@@ -9,14 +9,14 @@ class presentation extends StatefulWidget {
 }
 
 class _presentationState extends State<presentation> {
-  List<Slide> slides = [];
+  List<ContentConfig> slides = [];
 
   @override
   void initState() {
     super.initState();
 
     slides.add(
-      Slide(
+      ContentConfig(
         title: "Pixelfed",
         description:
             "Pixelfed is an image sharing system in the form of free software, using the ActivityPub protocol, to federate with the Fediverse.",
@@ -25,7 +25,7 @@ class _presentationState extends State<presentation> {
       ),
     );
     slides.add(
-      Slide(
+      ContentConfig(
         title: "Fediverse",
         description:
             "The Fediverse is a giant Network of social media platforms. There are platforms for microblogging, blogging, photoblogging, videohosting and much more and they are all interconnected or federated. So you only need one account to follow users on any of the platforms.",
@@ -34,7 +34,7 @@ class _presentationState extends State<presentation> {
       ),
     );
     slides.add(
-      Slide(
+      ContentConfig(
         title: "Privacy",
         description: "Ad free, Open Source, Your data's is YOUR data's",
         pathImage: "assets/images/privacy.png",
@@ -51,7 +51,7 @@ class _presentationState extends State<presentation> {
   @override
   Widget build(BuildContext context) {
     return IntroSlider(
-      slides: slides,
+      listContentConfig: slides,
       onDonePress: onDonePress,
     );
   }

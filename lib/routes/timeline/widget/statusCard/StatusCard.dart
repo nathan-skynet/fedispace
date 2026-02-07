@@ -7,6 +7,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:fedispace/core/api.dart';
+import 'package:fedispace/core/error_handler.dart';
 import 'package:fedispace/core/messages.dart';
 import 'package:fedispace/models/favourited.dart';
 import 'package:fedispace/models/status.dart';
@@ -16,8 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_html/shims/dart_ui_real.dart';
-import 'package:flutter_share_me/flutter_share_me.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 import 'package:like_button/like_button.dart';
@@ -75,13 +75,8 @@ class _StatusCardState extends State<StatusCard> {
           await rootBundle.load(audioasset); //load sound from assets
       Uint8List soundbytes =
           bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-      int result = await player.playBytes(soundbytes);
-      if (result == 1) {
-        //play success
-        print("Sound playing successful.");
-      } else {
-        print("Error while playing sound.");
-      }
+      await player.play(BytesSource(soundbytes));
+      print("Sound playing successful.");
       if (status.favorited) {
         newStatus = await widget.apiService.undoFavoriteStatus(status.id);
       } else {
@@ -108,13 +103,8 @@ class _StatusCardState extends State<StatusCard> {
           await rootBundle.load(audioasset); //load sound from assets
       Uint8List soundbytes =
           bytes.buffer.asUint8List(bytes.offsetInBytes, bytes.lengthInBytes);
-      int result = await player.playBytes(soundbytes);
-      if (result == 1) {
-        //play success
-        print("Sound playing successful.");
-      } else {
-        print("Error while playing sound.");
-      }
+      await player.play(BytesSource(soundbytes));
+      print("Sound playing successful.");
       if (status.favorited) {
         newStatus = await widget.apiService.undoFavoriteStatus(status.id);
       } else {
@@ -154,7 +144,7 @@ class _StatusCardState extends State<StatusCard> {
   }
 
   /// TODO change Share with SharePlus
-  final FlutterShareMe flutterShareMe = FlutterShareMe();
+  // final FlutterShareMe flutterShareMe = FlutterShareMe();
 
   late Uint8List imageDataBytes;
 
@@ -169,17 +159,30 @@ class _StatusCardState extends State<StatusCard> {
         padding: const EdgeInsets.all(0.0),
         child: Card(
           elevation: 10,
-          color: Colors.black45,
-          shape: const RoundedRectangleBorder(
-            side: BorderSide(color: Colors.black54, width: 1),
-            borderRadius: BorderRadius.all(Radius.circular(15)),
+          color: const Color(0xFF101010).withOpacity(0.8), // Semi-transparent dark
+          shape: RoundedRectangleBorder(
+            side: BorderSide(color: const Color(0xFF00F3FF).withOpacity(0.3), width: 1), // Neon border
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(15), bottomRight: Radius.circular(15)), // Angular corners
           ),
           clipBehavior: Clip.antiAliasWithSaveLayer,
-          child: Column(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  const Color(0xFF101010).withOpacity(0.9),
+                  const Color(0xFF050505).withOpacity(0.95),
+                ],
+              ),
+            ),
+            child: Column(
             children: [
               HeaderStatusCard(
                   postsAccount: status.account,
                   created_at: status.created_at,
+                  statusId: status.id,
                   apiService: widget.apiService),
 
               /// IF MEDIA ATTACHEMENT != 1
@@ -325,7 +328,10 @@ class _StatusCardState extends State<StatusCard> {
                     onTap: onFavoritePress,
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/PostDetail',
+                          arguments: {'post': status});
+                    },
                     icon: const Icon(FontAwesomeIcons.commentDots),
                   ),
                   Expanded(child: Container()),
@@ -341,8 +347,8 @@ class _StatusCardState extends State<StatusCard> {
                       ? Text(status.reblogs_count.toString())
                       : Container(),
                   IconButton(
-                      onPressed: () async {
-                        await flutterShareMe.shareToSystem(msg: status.url);
+                      onPressed: () {
+                        Share.share(status.url);
                       },
                       tooltip: "Share",
                       icon: const Icon(FontAwesomeIcons.shareNodes)),
@@ -379,7 +385,8 @@ class _StatusCardState extends State<StatusCard> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    const Divider(),
+                    const SizedBox(height: 10),
+                    Divider(color: const Color(0xFF00F3FF).withOpacity(0.3), thickness: 1), // Neon Divider
                     //status.replies_count != 0
                     // ? animatedContainerDemoScreenState("See ${status.replies_count.toString()} comments")
                     //  : Container(),
@@ -388,8 +395,10 @@ class _StatusCardState extends State<StatusCard> {
                   ],
                 ),
               )
+
             ],
           ),
+        ), // Closing Container
         ),
       );
     } else {
