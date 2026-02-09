@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
 import 'package:fedispace/core/api.dart';
+import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/core/unifiedpush.dart';
 import 'package:fedispace/models/account.dart';
 import 'package:fedispace/routes/homepage/homepage2.dart';
@@ -86,10 +87,10 @@ class _HomeScreen extends State<HomeScreen> {
               mainAxisSize: MainAxisSize.max,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
-                  "For the community by the community.",
+                Text(
+                  S.of(context).loginCommunityTagline,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                       fontStyle: FontStyle.italic,
                       color: Colors.white70,
                   ),
@@ -98,7 +99,7 @@ class _HomeScreen extends State<HomeScreen> {
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.white70),
                   TextSpan(children: [
-                    const TextSpan(text: "Made With ❤️ by "),
+                    TextSpan(text: S.of(context).loginMadeWith),
                     TextSpan(
                         style: const TextStyle(
                             color: Colors.blue,
@@ -116,7 +117,7 @@ class _HomeScreen extends State<HomeScreen> {
                               debugPrint("URL can't be launched.");
                             }
                           }),
-                    const TextSpan(text: " and The community..."),
+                    TextSpan(text: S.of(context).loginAndCommunity),
                   ]),
                 ),
                 Container(

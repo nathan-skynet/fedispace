@@ -193,6 +193,25 @@ class AppLocalizations {
   String get allCaughtUp => _t('allCaughtUp');
   String get searchPeople => _t('searchPeople');
 
+  // ── Login ──
+  String get loginSignIn => _t('loginSignIn');
+  String get loginCreateAccount => _t('loginCreateAccount');
+  String get loginWhatIsPixelfed => _t('loginWhatIsPixelfed');
+  String get loginEnterInstance => _t('loginEnterInstance');
+  String get loginConnectError => _t('loginConnectError');
+  String get loginAuthError => _t('loginAuthError');
+  String get loginCommunityTagline => _t('loginCommunityTagline');
+  String get loginMadeWith => _t('loginMadeWith');
+  String get loginAndCommunity => _t('loginAndCommunity');
+
+  // ── Presentation ──
+  String get presentPixelfedTitle => _t('presentPixelfedTitle');
+  String get presentPixelfedDesc => _t('presentPixelfedDesc');
+  String get presentFediverseTitle => _t('presentFediverseTitle');
+  String get presentFediverseDesc => _t('presentFediverseDesc');
+  String get presentPrivacyTitle => _t('presentPrivacyTitle');
+  String get presentPrivacyDesc => _t('presentPrivacyDesc');
+
   static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
   
   static const List<Locale> supportedLocales = [

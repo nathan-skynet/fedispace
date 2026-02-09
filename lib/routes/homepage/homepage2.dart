@@ -1,6 +1,7 @@
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/error_handler.dart';
 import 'package:fedispace/core/unifiedpush.dart';
+import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:oauth2_client/access_token_response.dart';
@@ -68,7 +69,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   Future<void> logInAction(String instanceUrl) async {
     if (instanceUrl.isEmpty) {
       Fluttertoast.showToast(
-          msg: "Please enter your instance URL",
+          msg: S.of(context).loginEnterInstance,
           backgroundColor: Colors.orange,
           textColor: Colors.black);
       return;
@@ -81,7 +82,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     } on ApiException {
       setState(() => _isLoading = false);
       Fluttertoast.showToast(
-          msg: "Could not connect. Is the Mobile API enabled?",
+          msg: S.of(context).loginConnectError,
           backgroundColor: Colors.red,
           textColor: Colors.white);
       return;
@@ -92,7 +93,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     } on ApiException {
       setState(() => _isLoading = false);
       Fluttertoast.showToast(
-          msg: "Authentication error",
+          msg: S.of(context).loginAuthError,
           backgroundColor: Colors.red,
           textColor: Colors.white);
     }
@@ -220,12 +221,12 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                 color: Colors.white,
                               ),
                             )
-                          : const Row(
+                          : Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'Sign In',
-                                  style: TextStyle(
+                                  S.of(context).loginSignIn,
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 17,
                                     fontWeight: FontWeight.w700,
@@ -250,7 +251,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
               children: [
                 Expanded(
                   child: _SecondaryButton(
-                    label: 'What is Pixelfed?',
+                    label: S.of(context).loginWhatIsPixelfed,
                     onTap: () =>
                         Navigator.pushNamed(context, '/presentation'),
                   ),
@@ -258,7 +259,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                 const SizedBox(width: 12),
                 Expanded(
                   child: _SecondaryButton(
-                    label: 'Create Account',
+                    label: S.of(context).loginCreateAccount,
                     onTap: () async {
                       Uri url =
                           Uri.parse("https://pix.echelon4.space/register");
