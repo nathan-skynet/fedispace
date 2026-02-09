@@ -5,7 +5,7 @@
 <h1 align="center">🚀 FediSpace</h1>
 
 <p align="center">
-  <strong>A beautiful, modern Pixelfed client built with Flutter</strong>
+  <strong>An AI-enhanced, modern Pixelfed client built with Flutter</strong>
 </p>
 
 <p align="center">
@@ -16,6 +16,7 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/🤖_AI_Powered-OpenAI-ff6b6b?style=for-the-badge&labelColor=0a0e1a" alt="AI Powered">
   <img src="https://img.shields.io/badge/🌍_16_Languages-Supported-success?style=for-the-badge&color=00ff88&labelColor=0a0e1a" alt="16 Languages">
   <img src="https://img.shields.io/badge/📱_Android-Ready-success?style=for-the-badge&color=3ddc84&labelColor=0a0e1a" alt="Android">
   <img src="https://img.shields.io/badge/🔔_Push_Notifications-UnifiedPush-blueviolet?style=for-the-badge&labelColor=0a0e1a" alt="Push Notifications">
@@ -25,9 +26,24 @@
 
 ## ✨ About
 
-**FediSpace** is a sleek, Instagram-inspired client for [Pixelfed](https://pixelfed.org/) — the federated, privacy-friendly image sharing platform. Experience the Fediverse with a polished, modern UI featuring a **cyberpunk-inspired dark theme**, smooth animations, and a powerful feature set.
+**FediSpace** is an **AI-supercharged**, Instagram-inspired client for [Pixelfed](https://pixelfed.org/) — the federated, privacy-friendly image sharing platform. It takes the original Pixelfed experience and **boosts it with artificial intelligence**: real-time post translation, AI-powered image editing, smart content discovery, and more — all wrapped in a **cyberpunk-inspired dark theme** with smooth animations.
 
-> *Browse your timeline, share stories, discover content, and connect with the Fediverse — all from a beautifully crafted mobile experience.*
+> *The Fediverse has never looked this good — or this smart.*
+
+---
+
+## 🤖 AI-Powered Features
+
+FediSpace goes beyond a standard Pixelfed client by integrating **AI at the core of the experience**:
+
+| Feature | What it does |
+|---|---|
+| 🌐 **Auto-Translate Posts** | Instantly translate any post into your language using OpenAI — read the global Fediverse without language barriers |
+| 🎨 **AI Image Editing** | Describe what you want changed and AI transforms your photos before posting — creative filters, style transfer, enhancements |
+| 🔄 **Smart Translation Settings** | Configure auto-translate for all posts, choose your target language, or translate on demand |
+| 🌍 **16 Language UI** | The entire app interface adapts to your language — powered by a comprehensive i18n system |
+
+> **How it works:** FediSpace connects to the OpenAI API (configurable in Settings) to provide translation and image editing capabilities. Your API key stays on your device — no data passes through third-party servers.
 
 ---
 
