@@ -595,14 +595,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  gesture_x_detector:
-    dependency: transitive
-    description:
-      name: gesture_x_detector
-      sha256: "777855ee4e1fa4d677c40d6a44b9106696ef6745879027c8871e334cee8cde1e"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.1"
   google_fonts:
     dependency: "direct main"
     description:
@@ -1519,14 +1511,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.4.0"
-  video_viewer:
-    dependency: "direct main"
-    description:
-      name: video_viewer
-      sha256: "543dc4ad297024ad04a984be91e5f6ab9fa292e2ab86b070c200b2de93acf376"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.2.7"
   visibility_detector:
     dependency: transitive
     description:

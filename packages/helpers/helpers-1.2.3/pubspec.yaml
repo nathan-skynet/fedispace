@@ -1,0 +1,18 @@
+name: helpers
+description: Helpers is a tool that allows you to convert repetitive and tedious statements into easy-to-read and intuitive statements.
+version: 1.2.3
+homepage: https://github.com/seel-channel/helpers
+
+environment:
+  sdk: ">=2.12.0 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  vector_math: ^2.1.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  lint: ^1.8.1

@@ -1,0 +1,47 @@
+name: wakelock_example
+description: >-2
+  Example app demonstrating how to use the wakelock plugin. It also includes integration tests for
+  testing the plugin in an integrated example.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  # Opt out of null safety on purpose because dependencies do not support sound null safety yet
+  # and flutter drive ignores the --no-sound-null-safety parameter.
+  # todo(creativecreatorormaybenot): switch to 2.12.0-0 lower bound.
+  sdk: '>=2.11.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  wakelock:
+    # When depending on this package from a real application you should use:
+    #   wakelock: ^x.y.z
+    # See https://dart.dev/tools/pub/dependencies#version-constraints
+    # The example app is bundled with the plugin so we use a path dependency on
+    # the parent directory to use the current plugin's version.
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_driver:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+  flutter_lints: ^1.0.4
+
+dependency_overrides:
+  # We override the platform dependencies of wakelock here because we use the example app for
+  # integration testing and want to make sure that the CI always runs integration tests using the
+  # current platform implementations.
+  wakelock_macos:
+    path: ../../wakelock_macos
+  wakelock_platform_interface:
+    path: ../../wakelock_platform_interface
+  wakelock_web:
+    path: ../../wakelock_web
+  wakelock_windows:
+    path: ../../wakelock_windows

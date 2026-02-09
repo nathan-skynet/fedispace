@@ -13,7 +13,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:fedispace/utils/social_actions.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:math';
-import 'package:video_viewer/video_viewer.dart';
+import 'package:fedispace/widgets/simple_video_player.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
@@ -43,7 +43,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
   bool _isFavorited = false;
   bool _isBookmarked = false;
   int _favoritesCount = 0;
-  late VideoViewerController _videoController;
+
   String? _replyToId;
 
   @override
@@ -52,7 +52,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
     _isFavorited = widget.post.favorited;
     _isBookmarked = widget.post.reblogged;
     _favoritesCount = widget.post.favourites_count;
-    _videoController = VideoViewerController();
+
     _loadComments();
   }
 
@@ -507,16 +507,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
             return SizedBox(
               width: double.infinity,
               height: 420,
-              child: VideoViewer(
-                enableVerticalSwapingGesture: false,
-                enableHorizontalSwapingGesture: false,
-                onFullscreenFixLandscape: false,
-                style: VideoViewerStyle(),
-                controller: _videoController,
-                source: {
-                  url: VideoSource(video: VideoPlayerController.network(url)),
-                },
-              ),
+              child: SimpleVideoPlayer(url: url),
             );
           } else {
             return FullScreenWidget(
@@ -551,18 +542,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
       return SizedBox(
         width: double.infinity,
         height: 420,
-        child: VideoViewer(
-          enableVerticalSwapingGesture: false,
-          enableHorizontalSwapingGesture: false,
-          onFullscreenFixLandscape: false,
-          style: VideoViewerStyle(),
-          controller: _videoController,
-          source: {
-            widget.post.attach: VideoSource(
-              video: VideoPlayerController.network(widget.post.attach),
-            ),
-          },
-        ),
+        child: SimpleVideoPlayer(url: widget.post.attach),
       );
     }
 

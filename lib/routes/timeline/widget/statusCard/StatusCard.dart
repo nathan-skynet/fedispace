@@ -23,7 +23,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 import 'package:like_button/like_button.dart';
-import 'package:video_viewer/video_viewer.dart';
+import 'package:fedispace/widgets/simple_video_player.dart';
 import 'package:zoom_pinch_overlay/zoom_pinch_overlay.dart';
 
 class StatusCard extends StatefulWidget {
@@ -43,7 +43,7 @@ class StatusCard extends StatefulWidget {
 class _StatusCardState extends State<StatusCard> {
   /// The [Status] instance that will be displayed with this widget.
   late Status status;
-  final VideoViewerController controller = VideoViewerController();
+
   final AudioPlayer player = AudioPlayer();
 
   @override
@@ -196,19 +196,10 @@ class _StatusCardState extends State<StatusCard> {
                   itemBuilder: (context, index, realIdx) {
                     /// IF MEDIA ATTACHAMENT IS [VIDEO] AND LENGTH != 1
                     if (status.attachement[index]["url"].contains(".mp4")) {
-                      return VideoViewer(
-                        enableVerticalSwapingGesture: false,
-                        enableHorizontalSwapingGesture: false,
-                        onFullscreenFixLandscape: false,
-                        style: VideoViewerStyle(),
-                        controller: controller,
-                        source: {
-                          status.attach: VideoSource(
-                            video: VideoPlayerController.network(
-                              status.attachement[index]["url"],
-                            ),
-                          )
-                        },
+                      return SimpleVideoPlayer(
+                        url: status.attachement[index]["url"],
+                        width: 490,
+                        height: 290,
                       );
                     } else {
                       /// IF MEDIA ATTACHEMENT IS [IMAGE] AND LENGTH != 1
@@ -250,20 +241,10 @@ class _StatusCardState extends State<StatusCard> {
                   Container(
                     width: 490,
                     height: 290,
-                    child: VideoViewer(
-                      enableVerticalSwapingGesture: false,
-                      enableHorizontalSwapingGesture: false,
-                      onFullscreenFixLandscape: false,
-                      style: VideoViewerStyle(
-                        thumbnail: Container(
-                          child: Container(),
-                        ),
-                      ),
-                      controller: controller,
-                      source: {
-                        status.attach: VideoSource(
-                            video: VideoPlayerController.network(status.attach))
-                      },
+                    child: SimpleVideoPlayer(
+                      url: status.attach,
+                      width: 490,
+                      height: 290,
                     ),
                   )
                 ] else ...[

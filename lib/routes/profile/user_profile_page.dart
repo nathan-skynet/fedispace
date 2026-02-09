@@ -10,7 +10,6 @@ import 'package:fedispace/widgets/instagram_post_card.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:video_player/video_player.dart';
-import 'package:video_viewer/video_viewer.dart';
 import 'package:fedispace/routes/messages/conversation_detail_page.dart';
 import 'package:fedispace/routes/profile/collections_page.dart';
 

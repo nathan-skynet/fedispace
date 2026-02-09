@@ -11,7 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
-import 'package:video_viewer/video_viewer.dart';
+import 'package:fedispace/widgets/simple_video_player.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -42,7 +42,7 @@ class _InstagramPostCardState extends State<InstagramPostCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _likeAnimationController;
   late Animation<double> _likeAnimation;
-  late VideoViewerController _videoController;
+
   
   late bool _isFavorited;
   late int _favouritesCount;
@@ -69,7 +69,7 @@ class _InstagramPostCardState extends State<InstagramPostCard>
         curve: Curves.easeOut,
       ),
     );
-    _videoController = VideoViewerController();
+
   }
   
   @override
@@ -382,18 +382,7 @@ class _InstagramPostCardState extends State<InstagramPostCard>
       return SizedBox(
         width: double.infinity,
         height: 400,
-        child: VideoViewer(
-          enableVerticalSwapingGesture: false,
-          enableHorizontalSwapingGesture: false,
-          onFullscreenFixLandscape: false,
-          style: VideoViewerStyle(),
-          controller: _videoController,
-          source: {
-            widget.status.attach: VideoSource(
-              video: VideoPlayerController.network(widget.status.attach),
-            )
-          },
-        ),
+        child: SimpleVideoPlayer(url: widget.status.attach),
       );
     }
 

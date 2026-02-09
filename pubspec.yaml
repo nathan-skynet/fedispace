@@ -41,7 +41,6 @@ dependencies:
   flutter_html: ^3.0.0
   infinite_scroll_pagination: ^5.1.1
   cached_network_image: ^3.2.1
-  video_viewer: ^1.2.7
   font_awesome_flutter: ^10.1.0
   unifiedpush: ^5.0.0
   intl: ^0.20.2

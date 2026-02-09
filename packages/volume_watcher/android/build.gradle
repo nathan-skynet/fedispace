@@ -1,0 +1,31 @@
+group 'com.magugi.volume_watcher'
+version '1.0'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.1.0'
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        jcenter()
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'com.magugi.volume_watcher'
+    compileSdkVersion 34
+
+    defaultConfig {
+        minSdkVersion 16
+    }
+}
