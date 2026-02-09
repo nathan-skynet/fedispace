@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
+import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/models/status.dart';
 import 'package:fedispace/widgets/instagram_post_card.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
+import 'package:fedispace/utils/social_actions.dart';
 
 /// Instagram-style liked posts page
 class LikedPostsPage extends StatefulWidget {
@@ -69,13 +71,36 @@ class _LikedPostsPageState extends State<LikedPostsPage> {
   }
 
   void _handleShare(Status status) {
-    // TODO: Implement share
-    appLogger.debug('Share tapped: ${status.id}');
+    SocialActions.shareStatus(status);
   }
 
-  void _handleBookmark(Status status) {
-    // TODO: Implement bookmark
+  void _handleBookmark(Status status) async {
+    // This page only shows liked posts, so bookmarking logic here
+    // would typically mean adding/removing from a separate bookmark list.
+    // For now, we'll just log it or show a toast.
     appLogger.debug('Bookmark tapped: ${status.id}');
+    // If you wanted to actually bookmark/unbookmark from this page,
+    // you'd need to manage the bookmarked state for each status,
+    // similar to how `_handleLike` removes the post.
+    // For a liked posts page, bookmarking might not directly remove it.
+    // Example of actual bookmarking logic (if `status` had a mutable `bookmarked` field):
+    /*
+    setState(() {
+      status.bookmarked = !status.bookmarked;
+    });
+    try {
+      if (status.bookmarked) {
+        await widget.apiService.bookmarkStatus(status.id!);
+      } else {
+        await widget.apiService.undoBookmarkStatus(status.id!);
+      }
+    } catch (e) {
+      setState(() {
+        status.bookmarked = !status.bookmarked; // Revert on error
+      });
+      appLogger.error('Failed to toggle bookmark', e);
+    }
+    */
   }
 
   void _handleProfileTap(Status status) {
@@ -92,7 +117,7 @@ class _LikedPostsPageState extends State<LikedPostsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Liked Posts'),
+        title: Text(S.of(context).likedPosts),
       ),
       body: _buildBody(isDark),
     );
@@ -115,7 +140,7 @@ class _LikedPostsPageState extends State<LikedPostsPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No Liked Posts',
+              S.of(context).likedPosts,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -151,7 +176,7 @@ class _LikedPostsPageState extends State<LikedPostsPage> {
               child: Center(
                 child: TextButton(
                   onPressed: () => _loadLikedPosts(maxId: _nextPageId),
-                  child: const Text('Load More'),
+                  child: Text(S.of(context).loading),
                 ),
               ),
             );

@@ -1,14 +1,15 @@
-// Initial Import
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fedispace/core/api.dart';
+import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/models/account.dart';
 import 'package:fedispace/models/accountUsers.dart';
-import 'package:fedispace/widgets/glitch_effect.dart';
+import 'package:fedispace/themes/cyberpunk_theme.dart';
+import 'package:fedispace/widgets/instagram_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart' as html;
-import 'package:flutter_blurhash/flutter_blurhash.dart';
+import 'package:video_player/video_player.dart';
 
 
 var UserAccount;
@@ -24,33 +25,28 @@ class Profile extends StatefulWidget {
 
 class _Profile extends State<Profile> {
   final apiService = ApiService();
-  final title = 'Fedi Space';
   int page = 1;
   Account? account;
   AccountUsers? accountUsers;
 
   late Object jsonData;
-   List<Map<String, dynamic>> arrayOfProducts = [];
+  List<Map<String, dynamic>> arrayOfProducts = [];
   bool isPageLoading = false;
 
-
   String getFormattedNumber(int? inputNumber) {
-    String result;
-    if (inputNumber! >= 1000000) {
-      result = "${(inputNumber / 1000000).toStringAsFixed(1)}M";
+    if (inputNumber == null) return '0';
+    if (inputNumber >= 1000000) {
+      return "${(inputNumber / 1000000).toStringAsFixed(1)}M";
     } else if (inputNumber >= 10000) {
-      result = "${(inputNumber / 1000).toStringAsFixed(1)}K";
-    } else {
-      result = inputNumber.toString();
+      return "${(inputNumber / 1000).toStringAsFixed(1)}K";
     }
-    return result;
+    return inputNumber.toString();
   }
 
   Future<Object> fetchAccount() async {
     final arguments = (ModalRoute.of(context)?.settings.arguments ??
         <String, dynamic>{}) as Map;
     if (arguments["id"] != null) {
-      print(arguments["id"]);
       AccountUsers currentAccount =
           (await widget.apiService.getUserAccount(arguments["id"].toString()));
       UserAccount = currentAccount;
@@ -62,44 +58,30 @@ class _Profile extends State<Profile> {
     }
   }
 
-  void makeRebuild(){
-    setState(() {
-      print("rebuild");
-    });
+  void makeRebuild() {
+    setState(() {});
   }
 
-  Future <List<Map<String, dynamic>>> _callAPIToGetListOfData() async {
-    if (isPageLoading == true || (isPageLoading == false && page == 1 )){
-      final responseDic ;
-      if(arrayOfProducts.length == 0 ){
+  Future<List<Map<String, dynamic>>> _callAPIToGetListOfData() async {
+    if (isPageLoading == true || (isPageLoading == false && page == 1)) {
+      final responseDic;
+      if (arrayOfProducts.length == 0) {
         responseDic = await widget.apiService.getUserStatus(UserAccount.id, page, "0");
-      }else{
-        responseDic = await widget.apiService.getUserStatus(UserAccount.id, page, arrayOfProducts[arrayOfProducts.length-1]["id"]);
+      } else {
+        responseDic = await widget.apiService.getUserStatus(UserAccount.id, page, arrayOfProducts[arrayOfProducts.length - 1]["id"]);
       }
       List<Map<String, dynamic>> temArr = List<Map<String, dynamic>>.from(responseDic);
-      print("_callAPIToGetListOfData");
-      print("page : ${page}");
-      print("length : ${arrayOfProducts.length}");
       if (page == 1) {
-        print(responseDic[0]);
         arrayOfProducts = temArr;
-      }
-      else {
-
-        print(responseDic[0]);
+      } else {
         arrayOfProducts.addAll(temArr);
       }
-      responseDic.forEach((element) {
-        print(element["id"]);
-      });
-      print(arrayOfProducts[arrayOfProducts.length -1]["id"]);
       return arrayOfProducts;
     }
-     return arrayOfProducts;
+    return arrayOfProducts;
   }
 
-
-    String avatarUrl() {
+  String avatarUrl() {
     var domain = widget.apiService.domainURL();
     if (UserAccount!.avatarUrl.contains("://")) {
       return UserAccount!.avatarUrl.toString();
@@ -113,20 +95,16 @@ class _Profile extends State<Profile> {
   @override
   void initState() {
     super.initState();
-
     _scrollController.addListener(() async {
       if (_scrollController.position.pixels ==
           _scrollController.position.maxScrollExtent) {
-        if (arrayOfProducts.length >= (16 * page)  ) {
+        if (arrayOfProducts.length >= (16 * page)) {
           page++;
-          print("PAGE NUMBER $page");
-          print("getting data");
           isPageLoading = true;
           await _callAPIToGetListOfData();
           isPageLoading = false;
           makeRebuild();
         }
-
       }
     });
   }
@@ -134,205 +112,287 @@ class _Profile extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Object>(
-        future: fetchAccount(),
-        builder: (BuildContext context, AsyncSnapshot<Object> snapshot) {
-          if (snapshot.hasData) {
-            return Scaffold(
-              backgroundColor: const Color(0xFF050505),
-              body: Stack(
-                children: [
-                  // Background with Carbon/Hex pattern
-                  Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                      decoration: const BoxDecoration(
-                          color: Color(0xFF050505),
-                          image: DecorationImage(
-                            image: NetworkImage("https://img.freepik.com/free-vector/dark-hexagonal-background-with-gradient-color_79603-1409.jpg"),
-                            fit: BoxFit.cover,
-                            opacity: 0.2,
-                          ))),
-                  
-                  // Header Section (Profile Info)
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    // height: MediaQuery.of(context).size.height * 0.35, // Increased height slightly
-                    padding: const EdgeInsets.only(top: 50, left: 20, right: 20, bottom: 20),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF101010).withOpacity(0.8),
-                      border: Border(bottom: BorderSide(color: const Color(0xFF00F3FF).withOpacity(0.5), width: 1)),
-                      boxShadow: [BoxShadow(color: const Color(0xFF00F3FF).withOpacity(0.1), blurRadius: 20)],
+      future: fetchAccount(),
+      builder: (BuildContext context, AsyncSnapshot<Object> snapshot) {
+        if (snapshot.hasData) {
+          return Scaffold(
+            backgroundColor: CyberpunkTheme.backgroundBlack,
+            body: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                // Collapsing app bar with avatar
+                SliverAppBar(
+                  expandedHeight: 200,
+                  floating: false,
+                  pinned: true,
+                  backgroundColor: CyberpunkTheme.backgroundBlack,
+                  leading: Navigator.canPop(context)
+                      ? IconButton(
+                          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+                          onPressed: () => Navigator.pop(context),
+                        )
+                      : null,
+                  actions: [
+                    IconButton(
+                      icon: const Icon(Icons.notifications_none_rounded, size: 22, color: CyberpunkTheme.textWhite),
+                      onPressed: () => Navigator.pushNamed(context, '/Notification'),
                     ),
+                    IconButton(
+                      icon: const Icon(Icons.settings_outlined, size: 22, color: CyberpunkTheme.textWhite),
+                      onPressed: () => Navigator.pushNamed(context, '/Settings'),
+                    ),
+                  ],
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            CyberpunkTheme.neonCyan.withOpacity(0.10),
+                            CyberpunkTheme.backgroundBlack,
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Profile info
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Avatar + Stats row
                         Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Avatar with Neon Border
+                            // Avatar
                             Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                border: Border.all(color: const Color(0xFF00F3FF), width: 2),
-                                boxShadow: [BoxShadow(color: const Color(0xFF00F3FF).withOpacity(0.5), blurRadius: 10)],
+                                border: Border.all(
+                                  color: CyberpunkTheme.neonCyan.withOpacity(0.5),
+                                  width: 2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: CyberpunkTheme.neonCyan.withOpacity(0.2),
+                                    blurRadius: 12,
+                                    spreadRadius: 0,
+                                  ),
+                                ],
                               ),
-                              child: ClipOval(
-                                child: Image.network(
-                                  avatarUrl(),
-                                  width: 80,
-                                  height: 80,
-                                  fit: BoxFit.cover,
+                              child: Padding(
+                                padding: const EdgeInsets.all(3),
+                                child: CircleAvatar(
+                                  radius: 36,
+                                  backgroundColor: CyberpunkTheme.cardDark,
+                                  backgroundImage: CachedNetworkImageProvider(avatarUrl()),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 20),
-                            // User Info
+                            const SizedBox(width: 24),
+                            // Stats
                             Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  GlitchEffect(
-                                    child: Text(
-                                      UserAccount?.displayName ?? "UNKNOWN IDENTIFIER",
-                                      style: const TextStyle(
-                                          fontFamily: 'Orbitron',
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          shadows: [Shadow(color: Color(0xFF00F3FF), blurRadius: 5)]
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                  _buildStatItem(S.of(context).posts, UserAccount.statuses_count),
+                                  GestureDetector(
+                                    onTap: () => Navigator.pushNamed(context, '/FollowersList', arguments: {
+                                      'userId': UserAccount.id,
+                                      'type': 'followers',
+                                    }),
+                                    child: _buildStatItem(S.of(context).followers, UserAccount.followers_count),
                                   ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    "Unit ID: ${UserAccount?.id ?? "N/A"}",
-                                    style: TextStyle(fontFamily: 'Rajdhani', color: Colors.grey.withOpacity(0.7), fontSize: 14),
-                                  ),
-                                  const SizedBox(height: 15),
-                                  // Stats Row
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      _buildStatItem("POSTS", UserAccount.statuses_count),
-                                      _buildStatItem("FOLLOWERS", UserAccount.followers_count),
-                                      _buildStatItem("FOLLOWING", UserAccount.following_count),
-                                    ],
+                                  GestureDetector(
+                                    onTap: () => Navigator.pushNamed(context, '/FollowersList', arguments: {
+                                      'userId': UserAccount.id,
+                                      'type': 'following',
+                                    }),
+                                    child: _buildStatItem(S.of(context).following, UserAccount.following_count),
                                   ),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 15),
-                        // Status Indicators
-                        Row(
-                          children: [
-                            _buildStatusBagde("PUBLIC", UserAccount.isLocked == false),
-                            const SizedBox(width: 10),
-                            _buildStatusBagde("BOT", UserAccount.isBot == true), // logic was UserAccount.isBot == false ? check : cancel. So if isBot is true, it should show check? The original logic was convoluted. Let's assume isBot true means it IS a bot.
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
 
-                  // Scrollable Body (Bio + Grid)
-                  Container(
-                    margin: EdgeInsets.only(top: 240), // Shifted down below header
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Bio / Note
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        const SizedBox(height: 14),
+
+                        // Display name
+                        Text(
+                          UserAccount?.displayName ?? 'User',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: CyberpunkTheme.textWhite,
+                          ),
+                        ),
+
+                        const SizedBox(height: 2),
+
+                        // Username
+                        Text(
+                          '@${UserAccount?.acct ?? ''}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: CyberpunkTheme.textSecondary,
+                          ),
+                        ),
+
+                        // Bio
+                        if (UserAccount?.note != null && UserAccount.note.toString().isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
                             child: html.Html(
-                              data: UserAccount?.note ?? "",
+                              data: UserAccount.note,
                               style: {
                                 "body": html.Style(
-                                  fontFamily: 'Rajdhani',
-                                  color: Colors.white.withOpacity(0.9),
-                                  fontSize: html.FontSize(16),
+                                  margin: html.Margins.zero,
+                                  padding: html.HtmlPaddings.zero,
+                                  fontSize: html.FontSize(14),
+                                  color: CyberpunkTheme.textWhite.withOpacity(0.9),
+                                  lineHeight: html.LineHeight(1.4),
                                 ),
-                                "a": html.Style(color: const Color(0xFFFF00FF)),
+                                "a": html.Style(
+                                  color: CyberpunkTheme.neonCyan,
+                                  textDecoration: TextDecoration.none,
+                                ),
                               },
                             ),
                           ),
-                          
-                          const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20),
-                            child: Divider(color: Color(0xFF00F3FF), height: 30),
-                          ),
 
-                          // Grid
-                          FutureBuilder(
-                            future: _callAPIToGetListOfData(),
-                            builder: (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasData && snapshot.data != null) {
-                                return GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  padding: EdgeInsets.zero, // Zero padding for full width
-                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    crossAxisSpacing: 1, // Minimal spacing line
-                                    mainAxisSpacing: 1,
-                                    childAspectRatio: 1, // Square photos
-                                  ),
-                                  itemCount: snapshot.data.length,
-                                  itemBuilder: (BuildContext context, int index) {
-                                    return GestureDetector(
-                                      onTap: () {
-                                         // Navigate to post detail
-                                         Navigator.pushNamed(
-                                           context,
-                                           '/statusDetail',
-                                           arguments: {
-                                             'statusId': snapshot.data[index]["id"],
-                                             'apiService': widget.apiService,
-                                           },
-                                         );
-                                       },
-                                      child: Container(
-                                        color: Colors.black, // Background for loading
-                                        child: CachedNetworkImage(
-                                          imageUrl: snapshot.data[index]["media_attachments"][0]["url"],
-                                          placeholder: (context, url) => Container(
-                                              color: const Color(0xFF101010),
-                                              child: const Center(child: CircularProgressIndicator(color: Color(0xFF00F3FF), strokeWidth: 2))
-                                          ),
-                                          errorWidget: (context, url, error) => const Center(child: Icon(Icons.broken_image, color: Colors.grey)),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                );
-                              } else if (snapshot.hasError) {
-                                return const Center(child: Text("DATA CORRUPTED", style: TextStyle(color: Colors.red)));
-                              }
-                              return const Center(child: CircularProgressIndicator(color: Color(0xFF00F3FF)));
-                            }
-                          ),
-                          const SizedBox(height: 100), // Bottom padding
-                        ],
-                      ),
+                        const SizedBox(height: 16),
+
+                        // Action buttons
+                        Row(
+                          children: [
+                            Expanded(
+                              child: OutlinedButton(
+                                onPressed: () => Navigator.pushNamed(context, '/EditProfile'),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: CyberpunkTheme.textWhite,
+                                  side: const BorderSide(color: CyberpunkTheme.borderDark),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                ),
+                                child: Text(S.of(context).editProfile, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+                        Container(height: 0.5, color: CyberpunkTheme.borderDark),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            );
-          }
-          if (snapshot.hasError) {
-            return const Center(child: Text("SYSTEM ERROR", style: TextStyle(color: Colors.red)));
-          }
-          return const Center(
-            child: CircularProgressIndicator(color: Color(0xFF00F3FF)),
+                ),
+
+                // Grid
+                SliverToBoxAdapter(
+                  child: FutureBuilder(
+                    future: _callAPIToGetListOfData(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: const EdgeInsets.only(top: 2),
+                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 1.5,
+                            mainAxisSpacing: 1.5,
+                            childAspectRatio: 1,
+                          ),
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final media = snapshot.data[index]["media_attachments"][0];
+                            final String url = media["url"];
+                            final String type = media["type"] ?? "image";
+                            final bool isVideo = type == "video" || type == "gifv";
+
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/statusDetail', arguments: {
+                                  'statusId': snapshot.data[index]["id"],
+                                  'apiService': widget.apiService,
+                                });
+                              },
+                              child: Stack(
+                                fit: StackFit.expand,
+                                children: [
+                                  isVideo
+                                      ? Stack(
+                                          fit: StackFit.expand,
+                                          children: [
+                                            _ProfileVideoItem(url: url),
+                                            const Center(
+                                              child: Icon(Icons.play_circle_outline, color: Colors.white, size: 36),
+                                            ),
+                                          ],
+                                        )
+                                      : CachedNetworkImage(
+                                          imageUrl: url,
+                                          placeholder: (context, url) => Container(
+                                            color: CyberpunkTheme.cardDark,
+                                            child: const Center(child: InstagramLoadingIndicator(size: 16)),
+                                          ),
+                                          errorWidget: (context, url, error) => Container(
+                                            color: CyberpunkTheme.cardDark,
+                                            child: const Icon(Icons.broken_image_outlined, color: CyberpunkTheme.textTertiary, size: 20),
+                                          ),
+                                          fit: BoxFit.cover,
+                                        ),
+                                  if ((snapshot.data[index]["media_attachments"] as List).length > 1)
+                                    Positioned(
+                                      top: 6,
+                                      right: 6,
+                                      child: Icon(
+                                        Icons.collections_rounded,
+                                        color: Colors.white.withOpacity(0.9),
+                                        size: 16,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                      } else if (snapshot.hasError) {
+                        return Padding(
+                          padding: const EdgeInsets.all(32),
+                          child: Center(child: Text(S.of(context).error, style: const TextStyle(color: CyberpunkTheme.textSecondary))),
+                        );
+                      }
+                      return const Padding(
+                        padding: EdgeInsets.all(32),
+                        child: Center(child: InstagramLoadingIndicator(size: 24)),
+                      );
+                    },
+                  ),
+                ),
+
+                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              ],
+            ),
           );
-        });
+        }
+        if (snapshot.hasError) {
+          return Scaffold(
+            backgroundColor: CyberpunkTheme.backgroundBlack,
+            body: Center(child: Text(S.of(context).error, style: const TextStyle(color: CyberpunkTheme.textSecondary))),
+          );
+        }
+        return Scaffold(
+          backgroundColor: CyberpunkTheme.backgroundBlack,
+          body: const Center(child: InstagramLoadingIndicator(size: 32)),
+        );
+      },
+    );
   }
 
   Widget _buildStatItem(String label, int value) {
@@ -341,40 +401,75 @@ class _Profile extends State<Profile> {
         Text(
           getFormattedNumber(value),
           style: const TextStyle(
-            fontFamily: 'Orbitron',
             fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFFFF00FF), // Neon Pink
+            fontWeight: FontWeight.w700,
+            color: CyberpunkTheme.textWhite,
           ),
         ),
+        const SizedBox(height: 2),
         Text(
           label,
           style: const TextStyle(
-            fontFamily: 'Rajdhani',
             fontSize: 12,
-            color: Colors.grey,
+            color: CyberpunkTheme.textSecondary,
           ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildStatusBagde(String label, bool isActive) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: isActive ? const Color(0xFF00F3FF).withOpacity(0.1) : Colors.red.withOpacity(0.1),
-        border: Border.all(color: isActive ? const Color(0xFF00F3FF) : Colors.red),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        isActive ? label : "NOT $label",
-        style: TextStyle(
-          fontFamily: 'Orbitron',
-          fontSize: 10,
-          color: isActive ? const Color(0xFF00F3FF) : Colors.red,
+class _ProfileVideoItem extends StatefulWidget {
+  final String url;
+  const _ProfileVideoItem({Key? key, required this.url}) : super(key: key);
+
+  @override
+  State<_ProfileVideoItem> createState() => _ProfileVideoItemState();
+}
+
+class _ProfileVideoItemState extends State<_ProfileVideoItem> {
+  late VideoPlayerController _controller;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(widget.url)
+      ..initialize().then((_) {
+        _controller.setVolume(0);
+        _controller.seekTo(const Duration(milliseconds: 100));
+        _controller.pause();
+        if (mounted) {
+          setState(() {
+            _initialized = true;
+          });
+        }
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_initialized) {
+      return SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _controller.value.size.width,
+            height: _controller.value.size.height,
+            child: IgnorePointer(child: VideoPlayer(_controller)),
+          ),
         ),
-      ),
+      );
+    }
+    return Container(
+      color: CyberpunkTheme.cardDark,
+      child: const Center(child: InstagramLoadingIndicator(size: 16)),
     );
   }
 }

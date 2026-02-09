@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
+import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/models/status.dart';
 import 'package:fedispace/widgets/instagram_post_card.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
+import 'package:fedispace/utils/social_actions.dart';
 
 /// Instagram-style bookmarks page
 class BookmarksPage extends StatefulWidget {
@@ -65,8 +67,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
   }
 
   void _handleShare(Status status) {
-    // TODO: Implement share
-    appLogger.debug('Share tapped: ${status.id}');
+    SocialActions.shareStatus(status);
   }
 
   void _handleBookmark(Status status) {
@@ -91,7 +92,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Saved'),
+        title: Text(S.of(context).bookmarks),
       ),
       body: _buildBody(isDark),
     );
@@ -114,7 +115,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Save Posts',
+              S.of(context).bookmarks,
               style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -150,7 +151,7 @@ class _BookmarksPageState extends State<BookmarksPage> {
               child: Center(
                 child: TextButton(
                   onPressed: () => _loadBookmarks(maxId: _nextPageId),
-                  child: const Text('Load More'),
+                  child: Text(S.of(context).loading),
                 ),
               ),
             );

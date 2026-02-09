@@ -28,7 +28,7 @@ class _Notification extends State<Notif> with TickerProviderStateMixin {
   late final Notif notif;
 
   Future<bool> _onWillPop() async {
-    Navigator.pushReplacementNamed(context, "/TimeLine");
+    Navigator.pushReplacementNamed(context, "/MainScreen");
     return false;
   }
 
@@ -73,7 +73,7 @@ class _Notification extends State<Notif> with TickerProviderStateMixin {
                     appBar: AppBar(
                       title: const Center(child: Text('Notifications')),
                     ),
-                    body: _body2(domain, notificationState),
+                    body: _body2(domain, notificationState, widget.apiService),
                   ),
                 );
               }
@@ -84,8 +84,17 @@ class _Notification extends State<Notif> with TickerProviderStateMixin {
   }
 }
 
-void onTap(context, id) {
-  Navigator.of(context).pushNamed('/Profile', arguments: {'id': id});
+void onTap(context, id, ApiService apiService) async {
+  try {
+    final currentAccount = await apiService.getCurrentAccount();
+    if (currentAccount.id == id) {
+      Navigator.of(context).pushNamed('/Profile');
+    } else {
+      Navigator.of(context).pushNamed('/UserProfile', arguments: {'userId': id});
+    }
+  } catch (e) {
+    Navigator.of(context).pushNamed('/UserProfile', arguments: {'userId': id});
+  }
 }
 
 String convertToAgo(DateTime input) {
@@ -104,7 +113,7 @@ String convertToAgo(DateTime input) {
   }
 }
 
-Widget _body2(domain, data) {
+Widget _body2(domain, data, ApiService apiService) {
   return ListView.builder(
       itemCount: data.length,
       itemBuilder: (context, index) {
@@ -125,7 +134,7 @@ Widget _body2(domain, data) {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      onTap(context, data[index]["account"]["id"]);
+                      onTap(context, data[index]["account"]["id"], apiService);
                     },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10.0),

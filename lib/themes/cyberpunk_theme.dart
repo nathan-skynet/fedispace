@@ -2,132 +2,190 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CyberpunkTheme {
+  // Core palette
   static const Color backgroundBlack = Color(0xFF050505);
+  static const Color surfaceDark = Color(0xFF0E0E0E);
+  static const Color cardDark = Color(0xFF141414);
+  static const Color borderDark = Color(0xFF1E1E1E);
+  
+  // Accent colors
   static const Color neonCyan = Color(0xFF00F3FF);
   static const Color neonPink = Color(0xFFFF00FF);
   static const Color neonYellow = Color(0xFFFAFF00);
-  static const Color glassWhite = Color(0x1AFFFFFF);
-  static const Color textWhite = Color(0xFFE0E0E0);
+  
+  // Derived accents (softer)
+  static const Color cyanMuted = Color(0xFF00B8C4);
+  static const Color pinkMuted = Color(0xFFCC00CC);
+  
+  // Text
+  static const Color textWhite = Color(0xFFF0F0F0);
+  static const Color textSecondary = Color(0xFF8A8A8A);
+  static const Color textTertiary = Color(0xFF555555);
+  
+  // Glassmorphism
+  static const Color glassWhite = Color(0x0DFFFFFF);
+  static const Color glassBorder = Color(0x1AFFFFFF);
 
   static ThemeData get theme {
+    final inter = GoogleFonts.inter();
+
     return ThemeData(
       brightness: Brightness.dark,
       primaryColor: neonCyan,
       scaffoldBackgroundColor: backgroundBlack,
-      cardColor: const Color(0xFF101010),
+      cardColor: cardDark,
       canvasColor: backgroundBlack,
       
-      // Typography
+      // Typography — Inter everywhere, clean and modern
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.orbitron(color: textWhite, fontWeight: FontWeight.bold),
-        displayMedium: GoogleFonts.orbitron(color: textWhite, fontWeight: FontWeight.bold),
-        displaySmall: GoogleFonts.orbitron(color: textWhite, fontWeight: FontWeight.bold),
-        headlineLarge: GoogleFonts.orbitron(color: textWhite, fontWeight: FontWeight.bold),
-        headlineMedium: GoogleFonts.orbitron(color: neonCyan, fontWeight: FontWeight.bold),
-        headlineSmall: GoogleFonts.orbitron(color: textWhite, fontWeight: FontWeight.w600),
-        titleLarge: GoogleFonts.rajdhani(color: textWhite, fontWeight: FontWeight.bold, fontSize: 20),
-        titleMedium: GoogleFonts.rajdhani(color: textWhite, fontWeight: FontWeight.w600, fontSize: 18),
-        titleSmall: GoogleFonts.rajdhani(color: Colors.grey, fontWeight: FontWeight.w500, fontSize: 16),
-        bodyLarge: GoogleFonts.rajdhani(color: textWhite, fontSize: 16),
-        bodyMedium: GoogleFonts.rajdhani(color: textWhite, fontSize: 14),
-        bodySmall: GoogleFonts.rajdhani(color: Colors.grey, fontSize: 12),
+        displayLarge: inter.copyWith(color: textWhite, fontWeight: FontWeight.w700, fontSize: 28),
+        displayMedium: inter.copyWith(color: textWhite, fontWeight: FontWeight.w700, fontSize: 24),
+        displaySmall: inter.copyWith(color: textWhite, fontWeight: FontWeight.w600, fontSize: 20),
+        headlineLarge: inter.copyWith(color: textWhite, fontWeight: FontWeight.w700, fontSize: 22),
+        headlineMedium: inter.copyWith(color: neonCyan, fontWeight: FontWeight.w600, fontSize: 18),
+        headlineSmall: inter.copyWith(color: textWhite, fontWeight: FontWeight.w600, fontSize: 16),
+        titleLarge: inter.copyWith(color: textWhite, fontWeight: FontWeight.w600, fontSize: 18),
+        titleMedium: inter.copyWith(color: textWhite, fontWeight: FontWeight.w500, fontSize: 16),
+        titleSmall: inter.copyWith(color: textSecondary, fontWeight: FontWeight.w500, fontSize: 14),
+        bodyLarge: inter.copyWith(color: textWhite, fontSize: 15),
+        bodyMedium: inter.copyWith(color: textWhite, fontSize: 14),
+        bodySmall: inter.copyWith(color: textSecondary, fontSize: 12),
+        labelLarge: inter.copyWith(color: textWhite, fontWeight: FontWeight.w600, fontSize: 14),
+        labelMedium: inter.copyWith(color: textSecondary, fontSize: 12),
+        labelSmall: inter.copyWith(color: textTertiary, fontSize: 11),
       ),
 
-      // App Bar
+      // App Bar — clean dark, no glow
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: backgroundBlack,
         elevation: 0,
-        centerTitle: true,
-        titleTextStyle: GoogleFonts.orbitron(
-          color: neonCyan,
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          shadows: [
-            const Shadow(color: neonCyan, blurRadius: 10),
-          ],
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+        titleTextStyle: inter.copyWith(
+          color: textWhite,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
         ),
-        iconTheme: const IconThemeData(color: neonCyan),
+        iconTheme: const IconThemeData(color: textWhite, size: 24),
       ),
 
-      // Bottom Navigation Bar
+      // Bottom Navigation
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: const Color(0xFF0A0A0A).withOpacity(0.9),
+        backgroundColor: surfaceDark,
         selectedItemColor: neonCyan,
-        unselectedItemColor: Colors.grey.withOpacity(0.5),
-        selectedIconTheme: const IconThemeData(
-          size: 30,
-          shadows: [Shadow(color: neonCyan, blurRadius: 8)],
-        ),
+        unselectedItemColor: textTertiary,
+        selectedIconTheme: const IconThemeData(size: 26),
         unselectedIconTheme: const IconThemeData(size: 24),
         type: BottomNavigationBarType.fixed,
-        elevation: 20,
+        elevation: 0,
       ),
 
-      // Card Theme
+      // Card Theme — glassmorphic
       cardTheme: CardThemeData(
-        color: const Color(0xFF121212),
-        elevation: 5,
-        shadowColor: neonCyan.withOpacity(0.4),
+        color: cardDark,
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          side: BorderSide(color: neonCyan.withOpacity(0.3), width: 1),
-          borderRadius: BorderRadius.circular(4), // Slightly angular
+          side: const BorderSide(color: glassBorder, width: 0.5),
+          borderRadius: BorderRadius.circular(14),
         ),
       ),
 
-      // Input Decoration
+      // Input Decoration — clean rounded
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: const Color(0xFF1A1A1A),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide(color: neonCyan.withOpacity(0.5)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: borderDark),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4),
-          borderSide: BorderSide(color: neonCyan.withOpacity(0.3)),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: borderDark),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(0), // Sharp on focus
-          borderSide: const BorderSide(color: neonCyan, width: 2),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: neonCyan, width: 1.5),
         ),
-        hintStyle: GoogleFonts.rajdhani(color: Colors.grey),
-        labelStyle: GoogleFonts.rajdhani(color: neonCyan),
+        hintStyle: inter.copyWith(color: textTertiary, fontSize: 14),
+        labelStyle: inter.copyWith(color: textSecondary, fontSize: 14),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
 
       // Icon Theme
       iconTheme: const IconThemeData(
-        color: neonCyan,
+        color: textWhite,
         size: 24,
+      ),
+
+      // Divider
+      dividerTheme: const DividerThemeData(
+        color: borderDark,
+        thickness: 0.5,
+        space: 0,
       ),
 
       // Text Selection
       textSelectionTheme: TextSelectionThemeData(
-        cursorColor: neonPink,
-        selectionColor: neonPink.withOpacity(0.3),
-        selectionHandleColor: neonPink,
+        cursorColor: neonCyan,
+        selectionColor: neonCyan.withOpacity(0.2),
+        selectionHandleColor: neonCyan,
       ),
 
       // Floating Action Button
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        backgroundColor: neonPink,
-        foregroundColor: textWhite,
-        splashColor: neonCyan,
-        elevation: 10,
-        shape: const BeveledRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: neonCyan,
+        foregroundColor: Colors.black,
+        elevation: 4,
+        shape: CircleBorder(),
       ),
 
       // Color Scheme
       colorScheme: const ColorScheme.dark(
         primary: neonCyan,
         secondary: neonPink,
-        surface: backgroundBlack,
-        error: Colors.redAccent,
+        surface: surfaceDark,
+        error: Color(0xFFFF4757),
         onPrimary: Colors.black,
         onSecondary: Colors.white,
         onSurface: textWhite,
         onError: Colors.white,
+      ),
+
+      // Snackbar
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: cardDark,
+        contentTextStyle: inter.copyWith(color: textWhite, fontSize: 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        behavior: SnackBarBehavior.floating,
+      ),
+
+      // Dialog
+      dialogTheme: DialogThemeData(
+        backgroundColor: cardDark,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        titleTextStyle: inter.copyWith(color: textWhite, fontWeight: FontWeight.w600, fontSize: 18),
+        contentTextStyle: inter.copyWith(color: textSecondary, fontSize: 14),
+      ),
+
+      // List Tile
+      listTileTheme: ListTileThemeData(
+        textColor: textWhite,
+        iconColor: textSecondary,
+        tileColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+      ),
+
+      // Switch
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return neonCyan;
+          return textTertiary;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return neonCyan.withOpacity(0.3);
+          return borderDark;
+        }),
       ),
     );
   }

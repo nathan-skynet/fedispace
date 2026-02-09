@@ -87,15 +87,7 @@ class UnifiedPushService {
       // await _apiService!.subscribePushNotifications(endpointUrl);
       
       appLogger.info('Push endpoint registered: $endpointUrl');
-      
-      AwesomeNotifications().createNotification(
-        content: NotificationContent(
-          id: 100,
-          channelKey: 'internal',
-          title: 'Push Notifications Ready',
-          body: 'Successfully registered for push notifications',
-        ),
-      );
+      // Notification removed - was annoying the user
     } catch (e, stackTrace) {
       appLogger.error('Failed to register endpoint with server', e, stackTrace);
     }

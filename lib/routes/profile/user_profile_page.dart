@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
+import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/models/accountUsers.dart';
 import 'package:fedispace/models/status.dart';
+import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
 import 'package:fedispace/widgets/instagram_post_card.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_blurhash/flutter_blurhash.dart';
+import 'package:video_player/video_player.dart';
+import 'package:video_viewer/video_viewer.dart';
+import 'package:fedispace/routes/messages/conversation_detail_page.dart';
+import 'package:fedispace/routes/profile/collections_page.dart';
 
 /// Instagram-style user profile page for viewing other users
 class UserProfilePage extends StatefulWidget {
@@ -48,9 +55,21 @@ class _UserProfilePageState extends State<UserProfilePage>
     try {
       appLogger.debug('Loading user profile: ${widget.userId}');
       final account = await widget.apiService.getUserAccount(widget.userId);
+      
+      // Use getRelationships for accurate follow/mute/block state
+      bool following = account.following ?? false;
+      try {
+        final rels = await widget.apiService.getRelationships([widget.userId]);
+        if (rels.isNotEmpty) {
+          following = rels[0]['following'] == true;
+        }
+      } catch (e) {
+        appLogger.error('Error loading relationships', e);
+      }
+
       setState(() {
         _account = account;
-        _isFollowing = account.following ?? false;
+        _isFollowing = following;
         _isLoading = false;
       });
       _loadPosts();
@@ -136,7 +155,7 @@ class _UserProfilePageState extends State<UserProfilePage>
     if (_account == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: const Center(child: Text('Profile not found')),
+        body: Center(child: Text(S.of(context).error)),
       );
     }
 
@@ -144,11 +163,34 @@ class _UserProfilePageState extends State<UserProfilePage>
       appBar: AppBar(
         title: Text(_account!.username),
         actions: [
-          IconButton(
+          PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
-            onPressed: () {
-              // TODO: Show options menu
+            onSelected: (value) async {
+              if (value == 'block') {
+                 // TODO: Implement block API call
+                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).block)));
+              } else if (value == 'mute') {
+                 await widget.apiService.muteUser(widget.userId);
+                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).mute)));
+              } else if (value == 'report') {
+                 // TODO: Implement report API call
+                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).report)));
+              }
             },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                value: 'mute',
+                child: Text(S.of(context).mute),
+              ),
+              PopupMenuItem<String>(
+                value: 'block',
+                child: Text(S.of(context).block),
+              ),
+              PopupMenuItem<String>(
+                value: 'report',
+                child: Text(S.of(context).report),
+              ),
+            ],
           ),
         ],
       ),
@@ -214,18 +256,18 @@ class _UserProfilePageState extends State<UserProfilePage>
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildStatColumn(
-                    _account!.statuses_count?.toString() ?? '0', 'Posts'),
+                    _account!.statuses_count?.toString() ?? '0', S.of(context).posts),
                 GestureDetector(
                   onTap: _navigateToFollowers,
                   child: _buildStatColumn(
                       _account!.followers_count?.toString() ?? '0',
-                      'Followers'),
+                      S.of(context).followers),
                 ),
                 GestureDetector(
                   onTap: _navigateToFollowing,
                   child: _buildStatColumn(
                       _account!.following_count?.toString() ?? '0',
-                      'Following'),
+                      S.of(context).following),
                 ),
               ],
             ),
@@ -298,28 +340,186 @@ class _UserProfilePageState extends State<UserProfilePage>
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         children: [
+          // Follow Button
           Expanded(
-            child: InstagramFollowButton(
-              isFollowing: _isFollowing,
-              onPressed: _toggleFollow,
+            child: SizedBox(
+               height: 35, // Explicit height
+               child: InstagramFollowButton(
+                isFollowing: _isFollowing,
+                onPressed: _toggleFollow,
+              ),
             ),
           ),
           const SizedBox(width: 8),
+          
+          // Message Button
           SizedBox(
-            width: 40,
-            height: 30,
-            child: OutlinedButton(
-              onPressed: () {
-                // TODO: Message user
-              },
-              style: OutlinedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+            width: 45,
+            height: 35,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.mail_outline, size: 18),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.mail_outline, size: 20),
+                onPressed: () {
+                   Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ConversationDetailPage(
+                        apiService: widget.apiService,
+                        conversationId: _account!.username,
+                        recipientName: _account!.display_name.isNotEmpty ? _account!.display_name : _account!.username,
+                        recipientUsername: _account!.username,
+                        recipientAvatar: _account!.avatar.isNotEmpty ? _account!.avatar : null,
+                        recipientId: widget.userId,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
+          ),
+          const SizedBox(width: 8),
+
+          // More Options Button
+          SizedBox(
+            width: 45,
+            height: 35,
+             child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey.withOpacity(0.5)),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: const Icon(Icons.more_horiz, size: 20),
+                onPressed: _showMoreOptions,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showMoreOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: CyberpunkTheme.surfaceDark,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40, height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(color: CyberpunkTheme.textTertiary, borderRadius: BorderRadius.circular(2)),
+            ),
+            ListTile(
+              leading: Icon(Icons.push_pin_outlined, color: CyberpunkTheme.textWhite),
+              title: Text(S.of(context).follow, style: TextStyle(color: CyberpunkTheme.textWhite)),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final ok = await widget.apiService.pinAccount(widget.userId);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(ok ? S.of(context).success : S.of(context).error, style: const TextStyle(color: Colors.white)),
+                    backgroundColor: ok ? CyberpunkTheme.neonCyan.withOpacity(0.8) : Colors.red,
+                    behavior: SnackBarBehavior.floating,
+                  ));
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.collections_outlined, color: CyberpunkTheme.textWhite),
+              title: Text(S.of(context).collections, style: TextStyle(color: CyberpunkTheme.textWhite)),
+              onTap: () {
+                Navigator.pop(ctx);
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (_) => CollectionsPage(apiService: widget.apiService, accountId: widget.userId),
+                ));
+              },
+            ),
+            Divider(color: CyberpunkTheme.borderDark),
+            ListTile(
+              leading: const Icon(Icons.report_gmailerrorred, color: Colors.red),
+              title: Text(S.of(context).report, style: const TextStyle(color: Colors.red)),
+              onTap: () {
+                Navigator.pop(ctx);
+                _showReportDialog();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.block, color: Colors.red),
+              title: Text(S.of(context).block, style: const TextStyle(color: Colors.red)),
+              onTap: () async {
+                Navigator.pop(ctx);
+                await widget.apiService.blockUser(widget.userId);
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).block)));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.volume_off, color: CyberpunkTheme.textWhite),
+              title: Text(S.of(context).mute, style: TextStyle(color: CyberpunkTheme.textWhite)),
+              onTap: () async {
+                Navigator.pop(ctx);
+                await widget.apiService.muteUser(widget.userId);
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).mute)));
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.person_remove_outlined, color: CyberpunkTheme.textWhite),
+              title: Text(S.of(context).unfollow, style: TextStyle(color: CyberpunkTheme.textWhite)),
+              onTap: () async {
+                Navigator.pop(ctx);
+                final ok = await widget.apiService.removeFromFollowers(widget.userId);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(ok ? S.of(context).success : S.of(context).error, style: const TextStyle(color: Colors.white)),
+                    behavior: SnackBarBehavior.floating,
+                  ));
+                }
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showReportDialog() {
+    final TextEditingController reasonController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(S.of(context).report),
+        content: TextField(
+          controller: reasonController,
+          decoration: InputDecoration(
+            hintText: S.of(context).report,
+            border: const OutlineInputBorder(),
+          ),
+          maxLines: 3,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(S.of(context).cancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await widget.apiService.reportUser(widget.userId, comment: reasonController.text);
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(S.of(context).success)));
+            },
+            child: Text(S.of(context).report, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -332,15 +532,15 @@ class _UserProfilePageState extends State<UserProfilePage>
     }
 
     if (_posts.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.photo_camera_outlined, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
+            const Icon(Icons.photo_camera_outlined, size: 64, color: Colors.grey),
+            const SizedBox(height: 16),
             Text(
-              'No Posts Yet',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+              S.of(context).noPosts,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
             ),
           ],
         ),
@@ -357,18 +557,109 @@ class _UserProfilePageState extends State<UserProfilePage>
       itemCount: _posts.length,
       itemBuilder: (context, index) {
         final post = _posts[index];
+        
+        // Robust video detection: check media type first, then extension
+        final firstMedia = post.getFirstMedia();
+        final isVideoType = firstMedia != null && (firstMedia['type'] == 'video' || firstMedia['type'] == 'gifv');
+        final isVideoExtension = post.attach.toLowerCase().contains('.mp4') || post.attach.toLowerCase().contains('.mov');
+        final isVideo = isVideoType || isVideoExtension;
+
+        // Determine image URL to display
+        // 1. Prefer preview_url (thumbnail)
+        // 2. If no preview, and NOT video, use main attach URL
+        // 3. If video and no preview, use empty string (don't load MP4 as image)
+        String imageUrl = post.preview_url;
+        if (imageUrl.isEmpty && !isVideo) {
+          imageUrl = post.attach;
+        }
+
         return GestureDetector(
           onTap: () {
-            // TODO: Navigate to post detail
+            Navigator.pushNamed(
+              context,
+              '/statusDetail',
+              arguments: {
+                'statusId': post.id,
+                'apiService': widget.apiService,
+              },
+            );
           },
-          child: CachedNetworkImage(
-            imageUrl: post.attach,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(color: Colors.grey[300]),
-            errorWidget: (context, url, error) => Container(
-              color: Colors.grey[300],
-              child: const Icon(Icons.error),
-            ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              if (isVideo)
+                Container(
+                  clipBehavior: Clip.hardEdge,
+                  decoration: const BoxDecoration(),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      _ProfileVideoItem(url: post.attach),
+                      const Center(
+                        child: Icon(
+                          Icons.play_circle_outline,
+                          color: Colors.white,
+                          size: 48,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else if (imageUrl.isNotEmpty)
+                CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Container(color: Colors.grey[300]),
+                  errorWidget: (context, url, error) => Container(
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.error),
+                  ),
+                )
+              else if (post.blurhash.isNotEmpty)
+                Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    BlurHash(hash: post.blurhash),
+                    Container(color: Colors.black26),
+                  ],
+                )
+              else
+                Container(
+                  color: Colors.black87,
+                  child: const Center(
+                    child: Icon(
+                      Icons.broken_image,
+                      color: Colors.white54,
+                      size: 32,
+                    ),
+                  ),
+                ),
+              if (isVideo)
+                const Center(
+                  child: Icon(
+                    Icons.play_circle_outline,
+                    color: Colors.white,
+                    size: 48,
+                  ),
+                ),
+              if (post.attachement.length > 1)
+                Positioned(
+                  top: 5,
+                  right: 5,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Icon(
+                      Icons.collections_rounded,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ),
+                ),
+            ],
           ),
         );
       },
@@ -376,15 +667,15 @@ class _UserProfilePageState extends State<UserProfilePage>
   }
 
   Widget _buildTaggedGrid() {
-    return const Center(
+    return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.person_pin_outlined, size: 64, color: Colors.grey),
-          SizedBox(height: 16),
+          const Icon(Icons.person_pin_outlined, size: 64, color: Colors.grey),
+          const SizedBox(height: 16),
           Text(
-            'No Tagged Posts',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            S.of(context).noPosts,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -414,5 +705,65 @@ class _StickyTabBarDelegate extends SliverPersistentHeaderDelegate {
   @override
   bool shouldRebuild(_StickyTabBarDelegate oldDelegate) {
     return false;
+  }
+}
+
+class _ProfileVideoItem extends StatefulWidget {
+  final String url;
+  const _ProfileVideoItem({Key? key, required this.url}) : super(key: key);
+
+  @override
+  State<_ProfileVideoItem> createState() => _ProfileVideoItemState();
+}
+
+class _ProfileVideoItemState extends State<_ProfileVideoItem> {
+  late VideoPlayerController _controller;
+  bool _initialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.network(widget.url)
+      ..initialize().then((_) {
+        // Force load first frame
+        _controller.setVolume(0);
+        _controller.seekTo(const Duration(milliseconds: 100)); 
+        _controller.pause();
+        if (mounted) {
+          setState(() {
+            _initialized = true;
+          });
+        }
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_initialized) {
+      return SizedBox.expand(
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: _controller.value.size.width,
+            height: _controller.value.size.height,
+            child: IgnorePointer( // Disable video controls interaction
+              child: VideoPlayer(_controller),
+            ),
+          ),
+        ),
+      );
+    }
+    return Container(
+      color: Colors.black,
+      child: const Center(
+        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+      ),
+    );
   }
 }

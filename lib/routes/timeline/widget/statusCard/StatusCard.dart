@@ -18,6 +18,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_blurhash/flutter_blurhash.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:full_screen_image_null_safe/full_screen_image_null_safe.dart';
 import 'package:like_button/like_button.dart';
@@ -143,15 +145,11 @@ class _StatusCardState extends State<StatusCard> {
     }
   }
 
-  /// TODO change Share with SharePlus
-  // final FlutterShareMe flutterShareMe = FlutterShareMe();
 
   late Uint8List imageDataBytes;
 
   @override
   Widget build(BuildContext context) {
-    // TODO: display more information on each status
-    // TODO: main text color (Colors.white) should change depending on theme
 
     if (status.sensitive != true && status.muted != true) {
       return Container(
@@ -218,11 +216,6 @@ class _StatusCardState extends State<StatusCard> {
                           child: Hero(
                               tag: Random().nextInt(10000).toString(),
                               child: ClipRRect(
-                                  // TODO NEED UPDATE CODE AND SEE LOG !!! APP CRASH
-                                  //child : ZoomOverlay(
-                                  //   minScale: 0.0, // Optional
-                                  //   maxScale: 6.0, // Optional
-                                  //   twoTouchOnly: true, // Defaults to false
                                   child: CachedNetworkImage(
                                       imageUrl: status.attachement[index]
                                           ["url"],
@@ -379,6 +372,37 @@ class _StatusCardState extends State<StatusCard> {
                         Expanded(
                           child: Html(
                             data: status.content,
+                            onLinkTap: (url, attributes, element) async {
+                              if (url == null) return;
+                              
+                              if (url.contains('/tags/')) {
+                                // Extract tag
+                                try {
+                                  final uri = Uri.parse(url);
+                                  final segments = uri.pathSegments;
+                                  final tagIndex = segments.indexOf('tags');
+                                  if (tagIndex != -1 && tagIndex + 1 < segments.length) {
+                                    final tag = segments[tagIndex + 1];
+                                    if (context.mounted) {
+                                      Navigator.pushNamed(context, '/TagTimeline', arguments: {'tag': tag});
+                                    }
+                                    return;
+                                  }
+                                } catch (e) {
+                                  print('Error parsing tag: $e');
+                                }
+                              }
+                              
+                              // Default: Launch URL
+                              try {
+                                final uri = Uri.parse(url);
+                                if (await canLaunchUrl(uri)) {
+                                  await launchUrl(uri, mode: LaunchMode.inAppWebView);
+                                }
+                              } catch (e) {
+                                print('Error launching URL: $e');
+                              }
+                            },
                           ),
                         ),
                         const SizedBox(width: 5),

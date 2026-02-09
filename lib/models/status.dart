@@ -110,7 +110,7 @@ class Status {
       acct: data['account']?['acct'] ?? '',
       // SECURITY FIX: Safe array access with null checking
       attach: firstMedia?['url'] ?? '',
-      preview_url: firstMedia?['preview_url'] ?? '',
+      preview_url: firstMedia?['preview_url'] ?? firstMedia?['preview_remote_url'] ?? '',
       created_at: data['created_at'] ?? '',
       favourites_count: data['favourites_count'] ?? 0,
       replies_count: data['replies_count'] ?? 0,

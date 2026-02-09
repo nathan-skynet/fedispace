@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fedispace/themes/cyberpunk_theme.dart';
 
-/// Instagram-style search bar
+/// Modern search bar with glassmorphic background
 class InstagramSearchBar extends StatelessWidget {
   final TextEditingController? controller;
   final String hintText;
@@ -23,14 +24,12 @@ class InstagramSearchBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF262626) : const Color(0xFFEFEFEF);
-
     return Container(
-      height: 36,
+      height: 40,
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(8),
+        color: CyberpunkTheme.cardDark,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: CyberpunkTheme.borderDark, width: 0.5),
       ),
       child: TextField(
         controller: controller,
@@ -43,16 +42,18 @@ class InstagramSearchBar extends StatelessWidget {
         decoration: InputDecoration(
           hintText: hintText,
           hintStyle: TextStyle(
-            color: isDark ? const Color(0xFFA8A8A8) : const Color(0xFF8E8E8E),
+            color: CyberpunkTheme.textTertiary,
             fontSize: 14,
           ),
           prefixIcon: Icon(
-            Icons.search,
+            Icons.search_rounded,
             size: 20,
-            color: isDark ? const Color(0xFFA8A8A8) : const Color(0xFF8E8E8E),
+            color: CyberpunkTheme.textTertiary,
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
           filled: false,
         ),
       ),
@@ -60,7 +61,7 @@ class InstagramSearchBar extends StatelessWidget {
   }
 }
 
-/// Instagram-style action button (for posts, stories, etc.)
+/// Action button with subtle tap animation
 class InstagramActionButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -71,7 +72,7 @@ class InstagramActionButton extends StatelessWidget {
     Key? key,
     required this.icon,
     required this.onTap,
-    this.size = 24,
+    this.size = 26,
     this.color,
   }) : super(key: key);
 
@@ -79,16 +80,20 @@ class InstagramActionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
-      child: Icon(
-        icon,
-        size: size,
-        color: color ?? Theme.of(context).iconTheme.color,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Icon(
+          icon,
+          size: size,
+          color: color ?? CyberpunkTheme.textWhite,
+        ),
       ),
     );
   }
 }
 
-/// Instagram-style follow button
+/// Follow button with gradient accent
 class InstagramFollowButton extends StatelessWidget {
   final bool isFollowing;
   final VoidCallback onPressed;
@@ -103,45 +108,46 @@ class InstagramFollowButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return SizedBox(
       width: width,
-      height: 30,
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isFollowing
-              ? (isDark ? const Color(0xFF262626) : const Color(0xFFEFEFEF))
-              : const Color(0xFF0095F6),
-          foregroundColor: isFollowing
-              ? (isDark ? Colors.white : Colors.black)
-              : Colors.white,
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-            side: isFollowing
-                ? BorderSide(
-                    color: isDark ? const Color(0xFF363636) : const Color(0xFFDBDBDB),
-                    width: 1,
-                  )
-                : BorderSide.none,
-          ),
-        ),
-        child: Text(
-          isFollowing ? 'Following' : 'Follow',
-          style: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ),
+      height: 34,
+      child: isFollowing
+          ? OutlinedButton(
+              onPressed: onPressed,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: CyberpunkTheme.textWhite,
+                side: const BorderSide(color: CyberpunkTheme.borderDark, width: 1),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+              ),
+              child: const Text('Following', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+            )
+          : Container(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [CyberpunkTheme.neonCyan, CyberpunkTheme.neonPink],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: ElevatedButton(
+                onPressed: onPressed,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  foregroundColor: Colors.black,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  padding: const EdgeInsets.symmetric(horizontal: 18),
+                ),
+                child: const Text('Follow', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
+              ),
+            ),
     );
   }
 }
 
-/// Instagram-style loading indicator
+/// Loading indicator with neon cyan
 class InstagramLoadingIndicator extends StatelessWidget {
   final double size;
 
@@ -157,22 +163,95 @@ class InstagramLoadingIndicator extends StatelessWidget {
       height: size,
       child: const CircularProgressIndicator(
         strokeWidth: 2,
-        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8E8E8E)),
+        valueColor: AlwaysStoppedAnimation<Color>(CyberpunkTheme.neonCyan),
       ),
     );
   }
 }
 
-/// Instagram-style divider
+/// Subtle divider
 class InstagramDivider extends StatelessWidget {
   const InstagramDivider({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       height: 0.5,
-      color: isDark ? const Color(0xFF262626) : const Color(0xFFDBDBDB),
+      color: CyberpunkTheme.borderDark,
+    );
+  }
+}
+
+/// Glassmorphic container helper
+class GlassCard extends StatelessWidget {
+  final Widget child;
+  final EdgeInsets? padding;
+  final EdgeInsets? margin;
+  final double borderRadius;
+
+  const GlassCard({
+    Key? key,
+    required this.child,
+    this.padding,
+    this.margin,
+    this.borderRadius = 14,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: margin,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: CyberpunkTheme.cardDark,
+        borderRadius: BorderRadius.circular(borderRadius),
+        border: Border.all(color: CyberpunkTheme.glassBorder, width: 0.5),
+      ),
+      child: child,
+    );
+  }
+}
+
+/// Section header
+class SectionHeader extends StatelessWidget {
+  final String title;
+  final VoidCallback? onSeeAll;
+
+  const SectionHeader({
+    Key? key,
+    required this.title,
+    this.onSeeAll,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
+              color: CyberpunkTheme.textWhite,
+            ),
+          ),
+          if (onSeeAll != null)
+            GestureDetector(
+              onTap: onSeeAll,
+              child: const Text(
+                'See All',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: CyberpunkTheme.neonCyan,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

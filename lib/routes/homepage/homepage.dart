@@ -41,15 +41,13 @@ class _HomeScreen extends State<HomeScreen> {
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
-              gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              Colors.lightBlue,
-              Colors.red.shade900,
-              Colors.blue.shade800,
-            ],
-          )),
+            color: Theme.of(context).scaffoldBackgroundColor,
+            image: const DecorationImage(
+              image: NetworkImage("https://img.freepik.com/free-vector/dark-hexagonal-background-with-gradient-color_79603-1409.jpg"), // Hex grid pattern
+              fit: BoxFit.cover,
+              opacity: 0.2, // Subtle background texture
+            ),
+          ),
         ),
         Login(
           apiService: widget.apiService,
@@ -57,14 +55,28 @@ class _HomeScreen extends State<HomeScreen> {
         ),
         Center(
           child: Container(
-              margin: const EdgeInsets.fromLTRB(0, 50, 0, 0),
-              width: 200,
-              height: 160,
-              decoration: const BoxDecoration(
-                  image: DecorationImage(
-                image: AssetImage("assets/images/logo/logo_color.png"),
-                fit: BoxFit.fill,
-              ))),
+              margin: const EdgeInsets.fromLTRB(0, 60, 0, 0),
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(32),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF00F3FF).withOpacity(0.25),
+                    blurRadius: 40,
+                    spreadRadius: 2,
+                  ),
+                  BoxShadow(
+                    color: const Color(0xFFFF2D78).withOpacity(0.15),
+                    blurRadius: 40,
+                    spreadRadius: 2,
+                  ),
+                ],
+                image: const DecorationImage(
+                  image: AssetImage("assets/icon/app_icon.png"),
+                  fit: BoxFit.cover,
+                ),
+              )),
         ),
         SizedBox(
             width: MediaQuery.of(context).size.width,
@@ -78,11 +90,13 @@ class _HomeScreen extends State<HomeScreen> {
                   "For the community by the community.",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                      fontStyle: FontStyle.italic, color: Colors.black),
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white70,
+                  ),
                 ),
                 Text.rich(
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.black),
+                  style: const TextStyle(color: Colors.white70),
                   TextSpan(children: [
                     const TextSpan(text: "Made With ❤️ by "),
                     TextSpan(

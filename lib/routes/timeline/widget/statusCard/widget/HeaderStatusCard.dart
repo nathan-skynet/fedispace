@@ -31,8 +31,18 @@ class HeaderStatusCard extends StatelessWidget {
     }
   }
 
-  void onTap(context, id) {
-    Navigator.of(context).pushNamed('/Profile', arguments: {'id': id});
+  void onTap(context, id) async {
+    try {
+      final currentAccount = await apiService.getCurrentAccount();
+      if (currentAccount.id == id) {
+        Navigator.of(context).pushNamed('/Profile');
+      } else {
+        Navigator.of(context).pushNamed('/UserProfile', arguments: {'userId': id});
+      }
+    } catch (e) {
+      // Fallback if fetch fails
+      Navigator.of(context).pushNamed('/UserProfile', arguments: {'userId': id});
+    }
   }
 
   @override
@@ -108,7 +118,13 @@ class HeaderStatusCard extends StatelessWidget {
                           );
                         } else if (index == 2) {
                           // Voir le profil - Navigate to profile
-                          Navigator.of(context).pushNamed('/Profile', arguments: {'id': postsAccount.id});
+                          try {
+                            // We can't easily await here without making onSelected async, which might be tricky with the library.
+                            // However, let's try to just trigger the onTap logic which handles it.
+                            onTap(context, postsAccount.id);
+                          } catch (e) {
+                             Navigator.of(context).pushNamed('/UserProfile', arguments: {'userId': postsAccount.id});
+                          }
                         } else if (index == 3) {
                           // Mute User
                           apiService.muteUser(postsAccount.id);

@@ -1,10 +1,10 @@
 import 'dart:io';
-import 'dart:ui';
-
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/models/account.dart';
+import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Account? account;
 
@@ -30,137 +30,197 @@ class NavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Object>(
-        future: fetchAccount(),
-        builder: (BuildContext context, AsyncSnapshot<Object> snapshot) {
-          if (snapshot.hasData) {
-            return Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF101010),
-                  borderRadius: const BorderRadius.only(
-                      bottomRight: Radius.circular(40),
-                      topRight: Radius.circular(30)), // Sharper angles
-                  border: Border.all(color: const Color(0xFF00F3FF).withOpacity(0.5), width: 1.5), // Neon Border
-                  boxShadow: const [
-                    BoxShadow(
-                        color: Color(0xFF00F3FF), // Neon glow
-                        blurRadius: 10,
-                        spreadRadius: 0,
-                        blurStyle: BlurStyle.outer),
-                  ],
+      future: fetchAccount(),
+      builder: (BuildContext context, AsyncSnapshot<Object> snapshot) {
+        if (snapshot.hasData) {
+          return Container(
+            width: 260,
+            decoration: BoxDecoration(
+              color: CyberpunkTheme.surfaceDark,
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+              border: Border(
+                right: BorderSide(color: CyberpunkTheme.neonCyan.withOpacity(0.15), width: 1),
+              ),
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+                    child: Row(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(color: CyberpunkTheme.neonCyan.withOpacity(0.4), width: 1.5),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(2),
+                            child: CircleAvatar(
+                              radius: 22,
+                              backgroundColor: CyberpunkTheme.cardDark,
+                              backgroundImage: account?.avatarUrl != null && account!.avatarUrl.isNotEmpty
+                                  ? CachedNetworkImageProvider(avatarurl())
+                                  : null,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                account?.displayName ?? 'User',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: CyberpunkTheme.textWhite,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '@${account?.acct ?? ''}',
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: CyberpunkTheme.textSecondary,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  Container(height: 0.5, color: CyberpunkTheme.borderDark),
+                  
+                  // Menu Items
+                  Expanded(
+                    child: ListView(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      children: [
+                        _DrawerItem(
+                          icon: Icons.person_outline_rounded,
+                          label: 'Profile',
+                          onTap: () => Navigator.pushNamed(context, '/Profile'),
+                        ),
+                        _DrawerItem(
+                          icon: Icons.notifications_none_rounded,
+                          label: 'Notifications',
+                          onTap: () => Navigator.pushNamed(context, '/Notification'),
+                        ),
+                        _DrawerItem(
+                          icon: Icons.mail_outline_rounded,
+                          label: 'Messages',
+                          onTap: () => Navigator.pushNamed(context, '/DirectMessages'),
+                        ),
+                        _DrawerItem(
+                          icon: Icons.explore_outlined,
+                          label: 'Discovery',
+                          onTap: () => Navigator.pushNamed(context, '/Local'),
+                        ),
+                        _DrawerItem(
+                          icon: Icons.search_rounded,
+                          label: 'Search',
+                          onTap: () => Navigator.pushNamed(context, '/Search'),
+                        ),
+                        
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Container(height: 0.5, color: CyberpunkTheme.borderDark),
+                        ),
+                        
+                        _DrawerItem(
+                          icon: Icons.settings_outlined,
+                          label: 'Settings',
+                          onTap: () => Navigator.pushNamed(context, '/Settings'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  Container(height: 0.5, color: CyberpunkTheme.borderDark),
+                  
+                  // Logout
+                  _DrawerItem(
+                    icon: Icons.logout_rounded,
+                    label: 'Logout',
+                    color: const Color(0xFFFF4757),
+                    onTap: () async {
+                      await apiService.logOut();
+                      exit(0);
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          return Container(
+            width: 260,
+            color: CyberpunkTheme.surfaceDark,
+            child: const Center(
+              child: Text('Error loading menu', style: TextStyle(color: CyberpunkTheme.textSecondary)),
+            ),
+          );
+        }
+        return Container(
+          width: 260,
+          color: CyberpunkTheme.surfaceDark,
+          child: const Center(child: CircularProgressIndicator(color: CyberpunkTheme.neonCyan)),
+        );
+      },
+    );
+  }
+}
+
+class _DrawerItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  final Color? color;
+
+  const _DrawerItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        splashColor: CyberpunkTheme.neonCyan.withOpacity(0.05),
+        highlightColor: CyberpunkTheme.neonCyan.withOpacity(0.03),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          child: Row(
+            children: [
+              Icon(icon, size: 22, color: color ?? CyberpunkTheme.textSecondary),
+              const SizedBox(width: 16),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: color ?? CyberpunkTheme.textWhite,
                 ),
-                width: 200,
-                child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                        topRight: Radius.circular(35),
-                        bottomRight: Radius.circular(35)),
-                    child: Drawer(
-                      child: ListView(
-                        // Remove padding
-                        padding: EdgeInsets.zero,
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF101010),
-                              border: Border(bottom: BorderSide(color: Color(0xFF00F3FF), width: 2)),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  account?.displayName ?? "UNKNOWN USER",
-                                  style: const TextStyle(
-                                    fontFamily: 'Orbitron',
-                                    fontSize: 18,
-                                    color: Color(0xFF00F3FF),
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  '@${account?.acct ?? "none"}',
-                                  style: const TextStyle(
-                                    fontFamily: 'Rajdhani',
-                                    fontSize:14,
-                                    color: Colors.white70,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          ListTile(
-                            leading: const Icon(FontAwesomeIcons.user),
-                            title: const Text('Profile',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                )),
-                            onTap: () =>
-                                Navigator.pushNamed(context, '/Profile'),
-                          ),
-                          ListTile(
-                              leading: const Icon(FontAwesomeIcons.bell),
-                              title: const Text('Notifications',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                  )),
-                              onTap: () => Navigator.pushNamed(
-                                  context, '/Notification')),
-                          ListTile(
-                            leading: const Icon(FontAwesomeIcons.inbox),
-                            title: const Text('Messages',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                )),
-                            onTap: () => Navigator.pushNamed(
-                                context, '/DirectMessages'),
-                          ),
-                          ListTile(
-                            leading: const Icon(FontAwesomeIcons.ccDiscover),
-                            title: const Text('Discovery',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                )),
-                            onTap: () => Navigator.pushNamed(context, '/Local'),
-                          ),
-                          const Divider(),
-                          ListTile(
-                            leading: const Icon(FontAwesomeIcons.gear),
-                            title: const Text('Settings',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                )),
-                            onTap: () => Navigator.pushNamed(context, '/Settings'),
-                          ),
-                          ListTile(
-                            leading:
-                                const Icon(FontAwesomeIcons.magnifyingGlass),
-                            title: const Text('Search',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                )),
-                            onTap: () => Navigator.pushNamed(context, '/Search'),
-                          ),
-                          const Divider(),
-                          ListTile(
-                              title: const Text('Logout',
-                                  style: TextStyle(
-                                      fontSize: 18, color: Colors.red)),
-                              leading: const Icon(
-                                  FontAwesomeIcons.solidFaceAngry,
-                                  color: Colors.red),
-                              onTap: () async {
-                                await apiService.logOut();
-                                exit(0);
-                              }),
-                        ],
-                      ),
-                    )));
-          } else if (snapshot.hasError) {
-            return const Text('Has error in function');
-          }
-          return const CircularProgressIndicator();
-        });
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

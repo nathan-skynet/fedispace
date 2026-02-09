@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/logger.dart';
 import 'package:fedispace/models/accountUsers.dart';
+import 'package:fedispace/l10n/app_localizations.dart';
+import 'package:fedispace/themes/cyberpunk_theme.dart';
+import 'package:fedispace/routes/profile/user_profile_page.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -127,7 +130,7 @@ class _FollowersListPageState extends State<FollowersListPage> {
             child: Center(
               child: TextButton(
                 onPressed: () => _loadAccounts(maxId: _nextPageId),
-                child: const Text('Load More'),
+                child: Text(S.of(context).loadMore),
               ),
             ),
           );
@@ -137,6 +140,7 @@ class _FollowersListPageState extends State<FollowersListPage> {
         return _UserListItem(
           account: account,
           onTap: () => _navigateToProfile(account),
+          apiService: widget.apiService,
         );
       },
     );
@@ -146,11 +150,13 @@ class _FollowersListPageState extends State<FollowersListPage> {
 class _UserListItem extends StatefulWidget {
   final AccountUsers account;
   final VoidCallback onTap;
+  final ApiService apiService;
 
   const _UserListItem({
     Key? key,
     required this.account,
     required this.onTap,
+    required this.apiService,
   }) : super(key: key);
 
   @override
@@ -210,11 +216,22 @@ class _UserListItemState extends State<_UserListItem> {
         width: 100,
         child: InstagramFollowButton(
           isFollowing: _isFollowing,
-          onPressed: () {
+          onPressed: () async {
             setState(() {
               _isFollowing = !_isFollowing;
             });
-            // TODO: Call API to follow/unfollow
+            try {
+              if (_isFollowing) {
+                await widget.apiService.followUser(widget.account.id);
+              } else {
+                await widget.apiService.unfollowUser(widget.account.id);
+              }
+            } catch (e) {
+              setState(() {
+                _isFollowing = !_isFollowing;
+              });
+              appLogger.error('Failed to toggle follow', e);
+            }
           },
         ),
       ),

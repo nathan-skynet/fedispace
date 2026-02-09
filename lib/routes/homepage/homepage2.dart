@@ -1,18 +1,22 @@
 import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/error_handler.dart';
 import 'package:fedispace/core/unifiedpush.dart';
-import 'package:fedispace/routes/homepage/inputWidget.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:oauth2_client/access_token_response.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 
 String os = Platform.operatingSystem;
 
+// Global controller for instance URL
+final TextEditingController _instanceController = TextEditingController();
+
+Future<String> randomFun() async {
+  return _instanceController.text.trim();
+}
+
 class Login extends StatefulWidget {
-  /// Main instance of the API service to use in the widget.
   final ApiService apiService;
   final UnifiedPushService unifiedPushService;
 
@@ -21,58 +25,76 @@ class Login extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<Login> createState() => _Login();
+  State<Login> createState() => _LoginState();
 }
 
-/// The [_LoginState] wraps the logic and state for the [Login] screen.
-class _Login extends State<Login> {
+class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
+  bool _isLoading = false;
+  late AnimationController _animController;
+  late Animation<double> _fadeAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
+    );
+    _animController.forward();
+    checkAuthStatus();
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
   Future<void> onValidAuth() async {
     final account = await widget.apiService.logIn();
 
-    /// TODO REVOIR UNIFIEDPUSH ENCORE UNE FOIS ET NOTIFICATION SERVICE
-    ///
-    if (Platform.isAndroid){
+    if (Platform.isAndroid) {
       await widget.unifiedPushService.initUnifiedPush();
-      await widget.unifiedPushService.startUnifiedPush(context, widget.apiService);
+      await widget.unifiedPushService
+          .startUnifiedPush(context, widget.apiService);
     }
 
-    Fluttertoast.showToast(
-        msg: "Successfully logged in. Welcome, ${account.username}!",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 2,
-        backgroundColor: Colors.green,
-        textColor: Colors.black,
-        fontSize: 16.0);
-    Navigator.pushNamedAndRemoveUntil(context, '/TimeLine', (route) => false);
+    Navigator.pushNamedAndRemoveUntil(context, '/MainScreen', (route) => false);
   }
 
   Future<void> logInAction(String instanceUrl) async {
+    if (instanceUrl.isEmpty) {
+      Fluttertoast.showToast(
+          msg: "Please enter your instance URL",
+          backgroundColor: Colors.orange,
+          textColor: Colors.black);
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
     try {
       await widget.apiService.registerApp(instanceUrl);
     } on ApiException {
+      setState(() => _isLoading = false);
       Fluttertoast.showToast(
-          msg: "Your instance has activated Mobile API ?",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
+          msg: "Could not connect. Is the Mobile API enabled?",
           backgroundColor: Colors.red,
-          textColor: Colors.black,
-          fontSize: 16.0);
+          textColor: Colors.white);
+      return;
     }
 
-    // We could register the app succesfully. Attempting to log in the user.
     try {
       return onValidAuth();
     } on ApiException {
+      setState(() => _isLoading = false);
       Fluttertoast.showToast(
-          msg: "Error in function onValidAuth !",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 2,
+          msg: "Authentication error",
           backgroundColor: Colors.red,
-          textColor: Colors.black,
-          fontSize: 16.0);
+          textColor: Colors.white);
     }
   }
 
@@ -88,166 +110,218 @@ class _Login extends State<Login> {
   }
 
   @override
-  void initState() {
-    checkAuthStatus();
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        Padding(
-          padding:
-              EdgeInsets.only(top: MediaQuery.of(context).size.height / 2.3),
-        ),
-        Column(
-          children: <Widget>[
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.only(left: 40, bottom: 10),
-                  child: Text(
-                    "Domain Instance",
-                    style: TextStyle(fontSize: 16, color: Color(0xFF999A9A)),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    return FadeTransition(
+      opacity: _fadeAnim,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          children: [
+            SizedBox(height: screenHeight * 0.38),
+
+            // Instance URL Input
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                color: isDark
+                    ? Colors.white.withOpacity(0.08)
+                    : Colors.black.withOpacity(0.04),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withOpacity(0.12)
+                      : Colors.black.withOpacity(0.08),
+                ),
+              ),
+              child: TextField(
+                controller: _instanceController,
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black87,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: InputDecoration(
+                  border: InputBorder.none,
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                  hintText: 'pixelfed.social',
+                  hintStyle: TextStyle(
+                    color: isDark
+                        ? Colors.white.withOpacity(0.3)
+                        : Colors.black.withOpacity(0.3),
+                    fontSize: 16,
+                  ),
+                  prefixIcon: Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 8),
+                    child: Icon(
+                      Icons.language_rounded,
+                      color: const Color(0xFF00F3FF).withOpacity(0.8),
+                      size: 22,
+                    ),
+                  ),
+                  prefixIconConstraints:
+                      const BoxConstraints(minWidth: 0, minHeight: 0),
+                  suffixIcon: _isLoading
+                      ? const Padding(
+                          padding: EdgeInsets.all(12),
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Color(0xFF00F3FF),
+                            ),
+                          ),
+                        )
+                      : null,
+                ),
+                textInputAction: TextInputAction.go,
+                onSubmitted: (_) => _handleLogin(),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Login Button
+            SizedBox(
+              width: double.infinity,
+              height: 56,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF00F3FF), Color(0xFF0077CC)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF00F3FF).withOpacity(0.3),
+                      blurRadius: 20,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(16),
+                    onTap: _isLoading ? null : _handleLogin,
+                    child: Center(
+                      child: _isLoading
+                          ? const SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.w700,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Icon(Icons.arrow_forward_rounded,
+                                    color: Colors.white, size: 20),
+                              ],
+                            ),
+                    ),
                   ),
                 ),
-                Stack(
-                  alignment: Alignment.bottomRight,
-                  children: <Widget>[
-                    InputWidget(30.0, 0.0),
-                    Padding(
-                        padding: const EdgeInsets.only(right: 50),
-                        child: Row(
-                          children: <Widget>[
-                            const Expanded(
-                                child: Padding(
-                              padding: EdgeInsets.only(top: 40),
-                              child: Text(
-                                'Enter your instance to continue...',
-                                textAlign: TextAlign.end,
-                                style: TextStyle(
-                                    color: Color(0xFFA0A0A0), fontSize: 12),
-                              ),
-                            )),
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: const ShapeDecoration(
-                                shape: CircleBorder(),
-                                gradient: LinearGradient(
-                                    colors: signInGradients,
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight),
-                              ),
-                              child: IconButton(
-                                icon: const Icon(
-                                  FontAwesomeIcons.arrowRight,
-                                  size: 30,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () async {
-                                  String urlDomain = await randomFun();
-                                  //print(urlDomain);
-                                  /// TODO Make Condition is Instance Pixelfed or not...
-                                  ///   bool resp = await widget.apiService
-                                  //    widget.apiService.NodeInfo(urlDomain);
-                                  await logInAction(urlDomain);
-                                },
-                              ),
-                            ),
-                          ],
-                        ))
-                  ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Secondary buttons row
+            Row(
+              children: [
+                Expanded(
+                  child: _SecondaryButton(
+                    label: 'What is Pixelfed?',
+                    onTap: () =>
+                        Navigator.pushNamed(context, '/presentation'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _SecondaryButton(
+                    label: 'Create Account',
+                    onTap: () async {
+                      Uri url =
+                          Uri.parse("https://pix.echelon4.space/register");
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url);
+                      }
+                    },
+                  ),
                 ),
               ],
             ),
-            const Padding(
-              padding: EdgeInsets.only(bottom: 50),
-            ),
-            GestureDetector(
-              onTap: () {
-                Navigator.pushNamed(context, '/presentation');
-              },
-              child: roundedRectButton(
-                  "What is Pixelfed", signInGradients, false, 0),
-            ),
-            GestureDetector(
-              onTap: () async {
-                Uri url = Uri.parse("https://pix.echelon4.space/register");
-                var urlLaunchable = await canLaunchUrl(
-                    url); //canLaunch is from url_launcher package
-                if (urlLaunchable) {
-                  await launchUrl(
-                      url); //launch is from url_launcher package to launch URL
-                } else {
-                  debugPrint("URL can't be launched.");
-                }
-              },
-              child: roundedRectButton(
-                  "Create an Account", signUpGradients, false, 0),
-            )
           ],
-        )
-      ],
+        ),
+      ),
     );
+  }
+
+  void _handleLogin() async {
+    String url = _instanceController.text.trim();
+    if (url.isNotEmpty) {
+      await logInAction(url);
+    }
   }
 }
 
-Widget roundedRectButton(
-    String title, List<Color> gradient, bool isEndIconVisible, list) {
-  return Builder(builder: (BuildContext mContext) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Stack(
-        alignment: const Alignment(1.0, 0.0),
-        children: <Widget>[
-          Container(
-            alignment: Alignment.center,
-            width: MediaQuery.of(mContext).size.width / 1.7,
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30.0)),
-              gradient: LinearGradient(
-                  colors: gradient,
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight),
+class _SecondaryButton extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _SecondaryButton({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withOpacity(0.15)
+                  : Colors.black.withOpacity(0.1),
             ),
-            padding: const EdgeInsets.only(top: 16, bottom: 16),
-            child: Text(title,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500)),
           ),
-          Visibility(
-            visible: isEndIconVisible,
-            child: Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: IconButton(
-                  icon: const Icon(
-                    FontAwesomeIcons.forward,
-                    size: 30,
-                    color: Colors.white,
-                  ),
-                  onPressed: () {
-                    if (list == 0) {
-                    } else {}
-                  },
-                )),
+          child: Center(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: isDark
+                    ? Colors.white.withOpacity(0.7)
+                    : Colors.black.withOpacity(0.6),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
-        ],
+        ),
       ),
     );
-  });
+  }
 }
-
-const List<Color> signInGradients = [
-  Color(0xFF00F3FF), // Neon Cyan
-  Color(0xFF0099CC),
-];
-
-const List<Color> signUpGradients = [
-  Color(0xFFFF00FF), // Neon Pink
-  Color(0xFFCC00CC),
-];

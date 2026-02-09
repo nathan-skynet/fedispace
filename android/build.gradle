@@ -35,6 +35,26 @@ subprojects {
     }
 }
 
+// Force consistent JVM target for receive_sharing_intent plugin
+gradle.projectsEvaluated {
+    def rsiProject = rootProject.subprojects.find { it.name == 'receive_sharing_intent' }
+    if (rsiProject != null) {
+        if (rsiProject.plugins.hasPlugin('com.android.library')) {
+            rsiProject.android {
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_1_8
+                    targetCompatibility JavaVersion.VERSION_1_8
+                }
+            }
+        }
+        rsiProject.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+            kotlinOptions {
+                jvmTarget = '1.8'
+            }
+        }
+    }
+}
+
 tasks.register("clean", Delete) {
     delete rootProject.layout.buildDirectory
 }
