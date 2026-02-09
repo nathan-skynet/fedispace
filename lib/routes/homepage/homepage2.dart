@@ -312,6 +312,7 @@ class _SecondaryButton extends StatelessWidget {
           child: Center(
             child: Text(
               label,
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: isDark
                     ? Colors.white.withOpacity(0.7)
