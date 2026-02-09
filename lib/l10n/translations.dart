@@ -85,6 +85,12 @@ const _en = <String, String>{
   "presentFediverseDesc": "The Fediverse is a giant Network of social media platforms. There are platforms for microblogging, blogging, photoblogging, videohosting and much more and they are all interconnected or federated. So you only need one account to follow users on any of the platforms.",
   "presentPrivacyTitle": "Privacy",
   "presentPrivacyDesc": "Ad free, Open Source, Your data is YOUR data",
+  "serverPickerTitle": "Choose a Community",
+  "serverPickerSubtitle": "Pick a Pixelfed server to create your account",
+  "serverPickerUsers": "users",
+  "serverPickerPosts": "posts",
+  "serverPickerOpenReg": "Open",
+  "serverPickerClosedReg": "Closed",
 };
 
 const _fr = <String, String>{
@@ -166,6 +172,12 @@ const _fr = <String, String>{
   "presentFediverseDesc": "Le Fediverse est un immense réseau de plateformes sociales. Il existe des plateformes de microblogging, de blogging, de partage de photos, d'hébergement de vidéos et bien plus, toutes interconnectées. Vous n'avez besoin que d'un seul compte pour suivre des utilisateurs sur n'importe quelle plateforme.",
   "presentPrivacyTitle": "Vie privée",
   "presentPrivacyDesc": "Sans pub, Open Source, vos données vous appartiennent",
+  "serverPickerTitle": "Choisir une communauté",
+  "serverPickerSubtitle": "Choisissez un serveur Pixelfed pour créer votre compte",
+  "serverPickerUsers": "utilisateurs",
+  "serverPickerPosts": "publications",
+  "serverPickerOpenReg": "Ouvert",
+  "serverPickerClosedReg": "Fermé",
 };
 
 const _es = <String, String>{
@@ -247,6 +259,12 @@ const _es = <String, String>{
   "presentFediverseDesc": "El Fediverse es una gigantesca red de plataformas sociales. Hay plataformas de microblogging, blogging, fotoblogging, alojamiento de vídeos y mucho más, todas interconectadas. Solo necesitas una cuenta para seguir usuarios en cualquier plataforma.",
   "presentPrivacyTitle": "Privacidad",
   "presentPrivacyDesc": "Sin anuncios, código abierto, tus datos son TUS datos",
+  "serverPickerTitle": "Elige una comunidad",
+  "serverPickerSubtitle": "Elige un servidor Pixelfed para crear tu cuenta",
+  "serverPickerUsers": "usuarios",
+  "serverPickerPosts": "publicaciones",
+  "serverPickerOpenReg": "Abierto",
+  "serverPickerClosedReg": "Cerrado",
 };
 
 const _de = <String, String>{
@@ -328,6 +346,12 @@ const _de = <String, String>{
   "presentFediverseDesc": "Das Fediverse ist ein riesiges Netzwerk sozialer Plattformen. Es gibt Plattformen für Microblogging, Blogging, Fotoblogging, Videohosting und vieles mehr – alle miteinander verbunden. Du brauchst nur ein Konto, um Nutzern auf jeder Plattform zu folgen.",
   "presentPrivacyTitle": "Datenschutz",
   "presentPrivacyDesc": "Werbefrei, Open Source, deine Daten gehören DIR",
+  "serverPickerTitle": "Wähle eine Community",
+  "serverPickerSubtitle": "Wähle einen Pixelfed-Server, um dein Konto zu erstellen",
+  "serverPickerUsers": "Nutzer",
+  "serverPickerPosts": "Beiträge",
+  "serverPickerOpenReg": "Offen",
+  "serverPickerClosedReg": "Geschlossen",
 };
 
 const _it = <String, String>{
@@ -409,6 +433,12 @@ const _it = <String, String>{
   "presentFediverseDesc": "Il Fediverse è una gigantesca rete di piattaforme social. Ci sono piattaforme per microblogging, blogging, condivisione foto, hosting video e molto altro, tutte interconnesse. Ti basta un solo account per seguire utenti su qualsiasi piattaforma.",
   "presentPrivacyTitle": "Privacy",
   "presentPrivacyDesc": "Senza pubblicità, Open Source, i tuoi dati sono TUOI",
+  "serverPickerTitle": "Scegli una comunità",
+  "serverPickerSubtitle": "Scegli un server Pixelfed per creare il tuo account",
+  "serverPickerUsers": "utenti",
+  "serverPickerPosts": "post",
+  "serverPickerOpenReg": "Aperto",
+  "serverPickerClosedReg": "Chiuso",
 };
 
 const _pt = <String, String>{
@@ -490,6 +520,12 @@ const _pt = <String, String>{
   "presentFediverseDesc": "O Fediverse é uma gigantesca rede de plataformas sociais. Existem plataformas de microblogging, blogging, compartilhamento de fotos, hospedagem de vídeos e muito mais, todas interconectadas. Você só precisa de uma conta para seguir usuários em qualquer plataforma.",
   "presentPrivacyTitle": "Privacidade",
   "presentPrivacyDesc": "Sem anúncios, código aberto, seus dados são SEUS",
+  "serverPickerTitle": "Escolha uma comunidade",
+  "serverPickerSubtitle": "Escolha um servidor Pixelfed para criar sua conta",
+  "serverPickerUsers": "usuários",
+  "serverPickerPosts": "publicações",
+  "serverPickerOpenReg": "Aberto",
+  "serverPickerClosedReg": "Fechado",
 };
 
 const _nl = <String, String>{
@@ -571,6 +607,12 @@ const _nl = <String, String>{
   "presentFediverseDesc": "Het Fediverse is een gigantisch netwerk van sociale platforms. Er zijn platforms voor microblogging, blogging, fotoblogging, videohosting en nog veel meer, allemaal met elkaar verbonden. Je hebt maar één account nodig om gebruikers op elk platform te volgen.",
   "presentPrivacyTitle": "Privacy",
   "presentPrivacyDesc": "Advertentievrij, Open Source, jouw gegevens zijn JOUW gegevens",
+  "serverPickerTitle": "Kies een community",
+  "serverPickerSubtitle": "Kies een Pixelfed-server om je account aan te maken",
+  "serverPickerUsers": "gebruikers",
+  "serverPickerPosts": "berichten",
+  "serverPickerOpenReg": "Open",
+  "serverPickerClosedReg": "Gesloten",
 };
 
 const _ru = <String, String>{
@@ -652,6 +694,12 @@ const _ru = <String, String>{
   "presentFediverseDesc": "Fediverse — огромная сеть социальных платформ. Существуют платформы для микроблогов, блогов, фотоблогов, видеохостинга и многого другого, и все они взаимосвязаны. Вам нужен только один аккаунт, чтобы подписываться на пользователей любой платформы.",
   "presentPrivacyTitle": "Приватность",
   "presentPrivacyDesc": "Без рекламы, с открытым кодом, ваши данные — ЭТО ВАШИ данные",
+  "serverPickerTitle": "Выберите сообщество",
+  "serverPickerSubtitle": "Выберите сервер Pixelfed для создания аккаунта",
+  "serverPickerUsers": "пользователей",
+  "serverPickerPosts": "публикаций",
+  "serverPickerOpenReg": "Открыто",
+  "serverPickerClosedReg": "Закрыто",
 };
 
 const _zh = <String, String>{
@@ -733,6 +781,12 @@ const _zh = <String, String>{
   "presentFediverseDesc": "联邦宇宙是一个庞大的社交媒体平台网络。包括微博客、博客、照片分享、视频托管等平台，它们全部互联互通。你只需一个账号就能关注任何平台上的用户。",
   "presentPrivacyTitle": "隐私",
   "presentPrivacyDesc": "无广告，开源，你的数据属于你",
+  "serverPickerTitle": "选择社区",
+  "serverPickerSubtitle": "选择一个Pixelfed服务器来创建你的账号",
+  "serverPickerUsers": "用户",
+  "serverPickerPosts": "帖子",
+  "serverPickerOpenReg": "开放",
+  "serverPickerClosedReg": "关闭",
 };
 
 const _ja = <String, String>{
@@ -814,6 +868,12 @@ const _ja = <String, String>{
   "presentFediverseDesc": "Fediverseは巨大なソーシャルメディアプラットフォームのネットワークです。マイクロブログ、ブログ、フォトブログ、動画ホスティングなど、すべてが相互接続されています。一つのアカウントだけで、どのプラットフォームのユーザーもフォローできます。",
   "presentPrivacyTitle": "プライバシー",
   "presentPrivacyDesc": "広告なし、オープンソース、あなたのデータはあなたのもの",
+  "serverPickerTitle": "コミュニティを選ぶ",
+  "serverPickerSubtitle": "アカウントを作成するPixelfedサーバーを選んでください",
+  "serverPickerUsers": "ユーザー",
+  "serverPickerPosts": "投稿",
+  "serverPickerOpenReg": "オープン",
+  "serverPickerClosedReg": "クローズ",
 };
 
 const _ko = <String, String>{
@@ -895,6 +955,12 @@ const _ko = <String, String>{
   "presentFediverseDesc": "Fediverse는 거대한 소셜 미디어 플랫폼 네트워크입니다. 마이크로블로그, 블로그, 포토블로그, 비디오 호스팅 등 다양한 플랫폼이 모두 상호 연결되어 있습니다. 어떤 플랫폼의 사용자든 팔로우하려면 하나의 계정만 있으면 됩니다.",
   "presentPrivacyTitle": "개인정보",
   "presentPrivacyDesc": "광고 없음, 오픈 소스, 당신의 데이터는 당신의 것",
+  "serverPickerTitle": "커뮤니티 선택",
+  "serverPickerSubtitle": "계정을 만들 Pixelfed 서버를 선택하세요",
+  "serverPickerUsers": "사용자",
+  "serverPickerPosts": "게시물",
+  "serverPickerOpenReg": "오픈",
+  "serverPickerClosedReg": "닫힘",
 };
 
 const _ar = <String, String>{
@@ -976,6 +1042,12 @@ const _ar = <String, String>{
   "presentFediverseDesc": "Fediverse هو شبكة ضخمة من منصات التواصل الاجتماعي. هناك منصات للتدوين المصغر والتدوين ومشاركة الصور واستضافة الفيديو وأكثر من ذلك، وجميعها مترابطة. تحتاج فقط إلى حساب واحد لمتابعة المستخدمين على أي منصة.",
   "presentPrivacyTitle": "الخصوصية",
   "presentPrivacyDesc": "بدون إعلانات، مفتوح المصدر، بياناتك هي بياناتك",
+  "serverPickerTitle": "اختر مجتمعاً",
+  "serverPickerSubtitle": "اختر خادم Pixelfed لإنشاء حسابك",
+  "serverPickerUsers": "مستخدمين",
+  "serverPickerPosts": "منشورات",
+  "serverPickerOpenReg": "مفتوح",
+  "serverPickerClosedReg": "مغلق",
 };
 
 const _hi = <String, String>{
@@ -1057,6 +1129,12 @@ const _hi = <String, String>{
   "presentFediverseDesc": "Fediverse सोशल मीडिया प्लेटफॉर्म का एक विशाल नेटवर्क है। माइक्रोब्लॉगिंग, ब्लॉगिंग, फोटो शेयरिंग, वीडियो होस्टिंग और बहुत कुछ के लिए प्लेटफॉर्म हैं और ये सभी आपस में जुड़े हैं। आपको किसी भी प्लेटफॉर्म पर उपयोगकर्ताओं को फॉलो करने के लिए केवल एक खाते की आवश्यकता है।",
   "presentPrivacyTitle": "गोपनीयता",
   "presentPrivacyDesc": "विज्ञापन मुक्त, ओपन सोर्स, आपका डेटा आपका है",
+  "serverPickerTitle": "समुदाय चुनें",
+  "serverPickerSubtitle": "अपना खाता बनाने के लिए एक Pixelfed सर्वर चुनें",
+  "serverPickerUsers": "उपयोगकर्ता",
+  "serverPickerPosts": "पोस्ट",
+  "serverPickerOpenReg": "खुला",
+  "serverPickerClosedReg": "बंद",
 };
 
 const _tr = <String, String>{
@@ -1138,6 +1216,12 @@ const _tr = <String, String>{
   "presentFediverseDesc": "Fediverse, devasa bir sosyal medya platformları ağıdır. Mikroblog, blog, fotoğraf paylaşımı, video barındırma ve çok daha fazlası için platformlar vardır ve hepsi birbirine bağlıdır. Herhangi bir platformdaki kullanıcıları takip etmek için tek bir hesap yeterlidir.",
   "presentPrivacyTitle": "Gizlilik",
   "presentPrivacyDesc": "Reklamsız, Açık Kaynak, verileriniz SİZİN verilerinizdir",
+  "serverPickerTitle": "Bir topluluk seçin",
+  "serverPickerSubtitle": "Hesabınızı oluşturmak için bir Pixelfed sunucusu seçin",
+  "serverPickerUsers": "kullanıcı",
+  "serverPickerPosts": "gönderi",
+  "serverPickerOpenReg": "Açık",
+  "serverPickerClosedReg": "Kapalı",
 };
 
 const _pl = <String, String>{
@@ -1219,6 +1303,12 @@ const _pl = <String, String>{
   "presentFediverseDesc": "Fediverse to ogromna sieć platform społecznościowych. Istnieją platformy do mikroblogowania, blogowania, udostępniania zdjęć, hostingu wideo i wiele więcej, wszystkie ze sobą połączone. Potrzebujesz tylko jednego konta, aby śledzić użytkowników na dowolnej platformie.",
   "presentPrivacyTitle": "Prywatność",
   "presentPrivacyDesc": "Bez reklam, otwarte źródło, Twoje dane to TWOJE dane",
+  "serverPickerTitle": "Wybierz społeczność",
+  "serverPickerSubtitle": "Wybierz serwer Pixelfed, aby utworzyć konto",
+  "serverPickerUsers": "użytkowników",
+  "serverPickerPosts": "postów",
+  "serverPickerOpenReg": "Otwarte",
+  "serverPickerClosedReg": "Zamknięte",
 };
 
 const _uk = <String, String>{
@@ -1300,4 +1390,10 @@ const _uk = <String, String>{
   "presentFediverseDesc": "Fediverse — величезна мережа соціальних платформ. Існують платформи для мікроблогів, блогів, фотоблогів, відеохостингу та багато іншого, і всі вони взаємопов'язані. Вам потрібен лише один акаунт, щоб підписуватися на користувачів будь-якої платформи.",
   "presentPrivacyTitle": "Приватність",
   "presentPrivacyDesc": "Без реклами, з відкритим кодом, ваші дані — це ВАШІ дані",
+  "serverPickerTitle": "Оберіть спільноту",
+  "serverPickerSubtitle": "Оберіть сервер Pixelfed для створення акаунту",
+  "serverPickerUsers": "користувачів",
+  "serverPickerPosts": "публікацій",
+  "serverPickerOpenReg": "Відкрито",
+  "serverPickerClosedReg": "Закрито",
 };

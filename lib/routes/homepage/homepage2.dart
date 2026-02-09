@@ -2,10 +2,10 @@ import 'package:fedispace/core/api.dart';
 import 'package:fedispace/core/error_handler.dart';
 import 'package:fedispace/core/unifiedpush.dart';
 import 'package:fedispace/l10n/app_localizations.dart';
+import 'package:fedispace/routes/homepage/server_picker_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:oauth2_client/access_token_response.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'dart:io';
 
 String os = Platform.operatingSystem;
@@ -260,12 +260,13 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                 Expanded(
                   child: _SecondaryButton(
                     label: S.of(context).loginCreateAccount,
-                    onTap: () async {
-                      Uri url =
-                          Uri.parse("https://pix.echelon4.space/register");
-                      if (await canLaunchUrl(url)) {
-                        await launchUrl(url);
-                      }
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ServerPickerPage(),
+                        ),
+                      );
                     },
                   ),
                 ),

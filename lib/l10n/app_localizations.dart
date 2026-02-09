@@ -212,6 +212,14 @@ class AppLocalizations {
   String get presentPrivacyTitle => _t('presentPrivacyTitle');
   String get presentPrivacyDesc => _t('presentPrivacyDesc');
 
+  // ── Server Picker ──
+  String get serverPickerTitle => _t('serverPickerTitle');
+  String get serverPickerSubtitle => _t('serverPickerSubtitle');
+  String get serverPickerUsers => _t('serverPickerUsers');
+  String get serverPickerPosts => _t('serverPickerPosts');
+  String get serverPickerOpenReg => _t('serverPickerOpenReg');
+  String get serverPickerClosedReg => _t('serverPickerClosedReg');
+
   static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
   
   static const List<Locale> supportedLocales = [
