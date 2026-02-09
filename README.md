@@ -34,16 +34,32 @@
 
 ## 🤖 AI-Powered Features
 
-FediSpace goes beyond a standard Pixelfed client by integrating **AI at the core of the experience**:
+FediSpace goes beyond a standard Pixelfed client by integrating **AI at the core of the experience** — and the best part? **You're not locked into any cloud provider.**
+
+### 🏠 Bring Your Own AI — Local or Cloud
+
+FediSpace works with **any OpenAI-compatible API**, which means you can use:
+
+| Provider | Type | Example |
+|---|---|---|
+| 🦙 **[Ollama](https://ollama.ai)** | Local LLM | Run Llama 3, Mistral, Gemma on your own machine |
+| 🖥️ **[LM Studio](https://lmstudio.ai)** | Local LLM | One-click local models with OpenAI-compatible server |
+| 🐳 **[LocalAI](https://localai.io)** | Self-hosted | Docker-based, drop-in OpenAI replacement |
+| ☁️ **[OpenAI](https://openai.com)** | Cloud | GPT-4o, GPT-4 Turbo |
+| 🌐 **Any compatible API** | Custom | Groq, Together AI, Mistral API, vLLM, text-generation-webui... |
+
+> **100% privacy-friendly:** Point FediSpace to your local Ollama instance and your data never leaves your network. Just enter your custom endpoint URL in Settings — no cloud required.
+
+### ✨ What AI Does
 
 | Feature | What it does |
 |---|---|
-| 🌐 **Auto-Translate Posts** | Instantly translate any post into your language using OpenAI — read the global Fediverse without language barriers |
+| 🌐 **Auto-Translate Posts** | Instantly translate any post into your language — read the global Fediverse without language barriers |
 | 🎨 **AI Image Editing** | Describe what you want changed and AI transforms your photos before posting — creative filters, style transfer, enhancements |
 | 🔄 **Smart Translation Settings** | Configure auto-translate for all posts, choose your target language, or translate on demand |
 | 🌍 **16 Language UI** | The entire app interface adapts to your language — powered by a comprehensive i18n system |
 
-> **How it works:** FediSpace connects to the OpenAI API (configurable in Settings) to provide translation and image editing capabilities. Your API key stays on your device — no data passes through third-party servers.
+> **How it works:** In Settings → Translation, set your API endpoint (cloud or local) and model. FediSpace speaks the OpenAI API format — if your server is compatible, it just works. Your API key and data stay on **your** device.
 
 ---
 
