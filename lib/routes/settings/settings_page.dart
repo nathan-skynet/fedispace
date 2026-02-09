@@ -6,6 +6,7 @@ import 'package:fedispace/main.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/widgets/instagram_widgets.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fedispace/routes/settings/domain_blocks_page.dart';
@@ -95,37 +96,87 @@ class _SettingsPageState extends State<SettingsPage> {
     _loadAiConfig();
   }
 
+  static const _secureStorage = FlutterSecureStorage();
+
   Future<void> _loadAiConfig() async {
     final prefs = await SharedPreferences.getInstance();
+    // Load non-sensitive settings from SharedPreferences
+    final appLocale = prefs.getString('app_locale') ?? '';
+    final privateAccount = prefs.getBool('private_account') ?? false;
+    final notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
+    final notifyMentions = prefs.getBool('notify_mentions') ?? true;
+    final notifyLikes = prefs.getBool('notify_likes') ?? true;
+    final notifyBoosts = prefs.getBool('notify_boosts') ?? true;
+    final notifyFollows = prefs.getBool('notify_follows') ?? true;
+    final notifyDMs = prefs.getBool('notify_dms') ?? true;
+    final notifyPolls = prefs.getBool('notify_polls') ?? true;
+    final libreTranslateUrl = prefs.getString('libretranslate_url') ?? 'https://libretranslate.com';
+    final translateTargetLang = prefs.getString('translate_target_lang') ?? 'en';
+    final autoTranslateEnabled = prefs.getBool('auto_translate_enabled') ?? false;
+    final translateProvider = prefs.getString('translate_provider') ?? 'libretranslate';
+    final openaiTranslateEndpoint = prefs.getString('openai_translate_endpoint') ?? 'https://api.openai.com/v1/chat/completions';
+    final defaultAiProvider = prefs.getString('ai_provider') ?? 'stability';
+
+    // SECURITY: Load API keys from encrypted secure storage
+    final libreTranslateApiKey = await _secureStorage.read(key: 'libretranslate_api_key') ?? '';
+    final openaiTranslateApiKey = await _secureStorage.read(key: 'openai_translate_api_key') ?? '';
+    final Map<String, String> aiKeys = {};
+    for (final p in _aiKeys.keys) {
+      aiKeys[p] = await _secureStorage.read(key: '${p}_api_key') ?? '';
+    }
+
+    // Migrate keys from SharedPreferences to secure storage (one-time)
+    await _migrateApiKeysIfNeeded(prefs);
+
     setState(() {
-      _appLocaleCode = prefs.getString('app_locale') ?? '';
-      _privateAccount = prefs.getBool('private_account') ?? false;
-      _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
-      _notifyMentions = prefs.getBool('notify_mentions') ?? true;
-      _notifyLikes = prefs.getBool('notify_likes') ?? true;
-      _notifyBoosts = prefs.getBool('notify_boosts') ?? true;
-      _notifyFollows = prefs.getBool('notify_follows') ?? true;
-      _notifyDMs = prefs.getBool('notify_dms') ?? true;
-      _notifyPolls = prefs.getBool('notify_polls') ?? true;
-
-      _libreTranslateUrl = prefs.getString('libretranslate_url') ?? 'https://libretranslate.com';
-      _libreTranslateApiKey = prefs.getString('libretranslate_api_key') ?? '';
-      _translateTargetLang = prefs.getString('translate_target_lang') ?? 'en';
-      _autoTranslateEnabled = prefs.getBool('auto_translate_enabled') ?? false;
-      _translateProvider = prefs.getString('translate_provider') ?? 'libretranslate';
-      _openaiTranslateEndpoint = prefs.getString('openai_translate_endpoint') ?? 'https://api.openai.com/v1/chat/completions';
-      _openaiTranslateApiKey = prefs.getString('openai_translate_api_key') ?? '';
-
-      _defaultAiProvider = prefs.getString('ai_provider') ?? 'stability';
-      for (final p in _aiKeys.keys) {
-        _aiKeys[p] = prefs.getString('${p}_api_key') ?? '';
+      _appLocaleCode = appLocale;
+      _privateAccount = privateAccount;
+      _notificationsEnabled = notificationsEnabled;
+      _notifyMentions = notifyMentions;
+      _notifyLikes = notifyLikes;
+      _notifyBoosts = notifyBoosts;
+      _notifyFollows = notifyFollows;
+      _notifyDMs = notifyDMs;
+      _notifyPolls = notifyPolls;
+      _libreTranslateUrl = libreTranslateUrl;
+      _libreTranslateApiKey = libreTranslateApiKey;
+      _translateTargetLang = translateTargetLang;
+      _autoTranslateEnabled = autoTranslateEnabled;
+      _translateProvider = translateProvider;
+      _openaiTranslateEndpoint = openaiTranslateEndpoint;
+      _openaiTranslateApiKey = openaiTranslateApiKey;
+      _defaultAiProvider = defaultAiProvider;
+      for (final p in aiKeys.keys) {
+        _aiKeys[p] = aiKeys[p] ?? '';
       }
     });
   }
 
+  /// One-time migration of API keys from SharedPreferences to FlutterSecureStorage
+  Future<void> _migrateApiKeysIfNeeded(SharedPreferences prefs) async {
+    if (prefs.getBool('api_keys_migrated') == true) return;
+
+    final keysToMigrate = [
+      'libretranslate_api_key',
+      'openai_translate_api_key',
+      ...(_aiKeys.keys.map((p) => '${p}_api_key')),
+    ];
+
+    for (final key in keysToMigrate) {
+      final value = prefs.getString(key);
+      if (value != null && value.isNotEmpty) {
+        await _secureStorage.write(key: key, value: value);
+        await prefs.remove(key); // Remove from insecure storage
+      }
+    }
+
+    await prefs.setBool('api_keys_migrated', true);
+    appLogger.info('API keys migrated to secure storage');
+  }
+
   Future<void> _saveAiKey(String provider, String key) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('${provider}_api_key', key);
+    // SECURITY: Save API keys to encrypted secure storage
+    await _secureStorage.write(key: '${provider}_api_key', value: key);
     setState(() => _aiKeys[provider] = key);
   }
 
@@ -431,8 +482,8 @@ class _SettingsPageState extends State<SettingsPage> {
           TextButton(
             onPressed: () async {
               final key = controller.text.trim();
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setString('libretranslate_api_key', key);
+              // SECURITY: Save to encrypted secure storage
+              await _secureStorage.write(key: 'libretranslate_api_key', value: key);
               setState(() => _libreTranslateApiKey = key);
               Navigator.pop(ctx);
             },
@@ -528,8 +579,8 @@ class _SettingsPageState extends State<SettingsPage> {
           TextButton(
             onPressed: () async {
               final key = controller.text.trim();
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setString('openai_translate_api_key', key);
+              // SECURITY: Save to encrypted secure storage
+              await _secureStorage.write(key: 'openai_translate_api_key', value: key);
               setState(() => _openaiTranslateApiKey = key);
               Navigator.pop(ctx);
             },

@@ -14,6 +14,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class sendPosts extends StatefulWidget {
@@ -504,7 +505,9 @@ class _sendPostsState extends State<sendPosts> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final provider = prefs.getString('ai_default_provider') ?? 'stability';
-      final apiKey = prefs.getString('${provider}_api_key') ?? '';
+      // SECURITY: Read API keys from encrypted secure storage
+      const secureStorage = FlutterSecureStorage();
+      final apiKey = await secureStorage.read(key: '${provider}_api_key') ?? '';
 
       if (apiKey.isEmpty) {
         if (mounted) Navigator.of(context).pop();
@@ -693,7 +696,9 @@ class _sendPostsState extends State<sendPosts> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final provider = prefs.getString('ai_default_provider') ?? 'stability';
-      final apiKey = prefs.getString('${provider}_api_key') ?? '';
+      // SECURITY: Read API keys from encrypted secure storage
+      const secureStorage = FlutterSecureStorage();
+      final apiKey = await secureStorage.read(key: '${provider}_api_key') ?? '';
 
       if (apiKey.isEmpty) {
         Navigator.of(context).pop();

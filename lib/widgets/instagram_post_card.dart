@@ -8,6 +8,7 @@ import 'package:fedispace/widgets/instagram_widgets.dart';
 import 'package:fedispace/themes/cyberpunk_theme.dart';
 import 'package:fedispace/utils/social_actions.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:video_player/video_player.dart';
@@ -144,7 +145,9 @@ class _InstagramPostCardState extends State<InstagramPostCard>
       if (provider == 'openai') {
         // ── OpenAI translation ──
         final endpoint = prefs.getString('openai_translate_endpoint') ?? 'https://api.openai.com/v1/chat/completions';
-        final apiKey = prefs.getString('openai_translate_api_key') ?? '';
+        // SECURITY: Read API keys from encrypted secure storage
+        const secureStorage = FlutterSecureStorage();
+        final apiKey = await secureStorage.read(key: 'openai_translate_api_key') ?? '';
         if (apiKey.isEmpty) {
           setState(() => _isTranslating = false);
           if (mounted) {
@@ -196,7 +199,9 @@ class _InstagramPostCardState extends State<InstagramPostCard>
       } else {
         // ── LibreTranslate ──
         final baseUrl = prefs.getString('libretranslate_url') ?? 'https://libretranslate.com';
-        final apiKey = prefs.getString('libretranslate_api_key') ?? '';
+        // SECURITY: Read API keys from encrypted secure storage
+        const secureStorage = FlutterSecureStorage();
+        final apiKey = await secureStorage.read(key: 'libretranslate_api_key') ?? '';
 
         final body = <String, dynamic>{
           'q': plainText,
