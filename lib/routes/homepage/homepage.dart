@@ -62,32 +62,7 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
           apiService: widget.apiService,
           unifiedPushService: widget.unifiedPushService,
         ),
-        Center(
-          child: Container(
-              margin: const EdgeInsets.fromLTRB(0, 60, 0, 0),
-              width: 140,
-              height: 140,
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF00F3FF).withValues(alpha: 0.25),
-                    blurRadius: 40,
-                    spreadRadius: 2,
-                  ),
-                  BoxShadow(
-                    color: const Color(0xFFFF2D78).withValues(alpha: 0.15),
-                    blurRadius: 40,
-                    spreadRadius: 2,
-                  ),
-                ],
-              ),
-              child: Image.asset(
-                "assets/icon/app_icon.png",
-                width: 140,
-                height: 140,
-                fit: BoxFit.contain,
-              )),
-        ),
+
         SizedBox(
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
