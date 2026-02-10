@@ -68,7 +68,6 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
               width: 140,
               height: 140,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF00F3FF).withValues(alpha: 0.25),
@@ -82,13 +81,11 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-              child: ClipOval(
-                child: Image.asset(
-                  "assets/icon/app_icon.png",
-                  width: 140,
-                  height: 140,
-                  fit: BoxFit.cover,
-                ),
+              child: Image.asset(
+                "assets/icon/app_icon.png",
+                width: 140,
+                height: 140,
+                fit: BoxFit.contain,
               )),
         ),
         SizedBox(
