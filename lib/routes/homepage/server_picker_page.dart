@@ -39,16 +39,51 @@ class _ServerPickerPageState extends State<ServerPickerPage>
   String _searchQuery = '';
 
   final List<_PixelfedServer> _servers = [
+    // Major / flagship instances
     _PixelfedServer(domain: 'pixelfed.social'),
-    _PixelfedServer(domain: 'pixel.tchncs.de'),
-    _PixelfedServer(domain: 'pixelfed.de'),
-    _PixelfedServer(domain: 'pixelfed.fr'),
+    _PixelfedServer(domain: 'pixelfed.com'),
     _PixelfedServer(domain: 'gram.social'),
     _PixelfedServer(domain: 'pxlmo.com'),
+    _PixelfedServer(domain: 'metapixl.com'),
+    _PixelfedServer(domain: 'photos.social'),
+    _PixelfedServer(domain: 'photofed.world'),
+    // Regional — Europe
+    _PixelfedServer(domain: 'pixelfed.de'),
+    _PixelfedServer(domain: 'pixel.tchncs.de'),
+    _PixelfedServer(domain: 'pxlfed.de'),
+    _PixelfedServer(domain: 'pixelfed.fr'),
+    _PixelfedServer(domain: 'pixelfed.es'),
     _PixelfedServer(domain: 'pixelfed.uno'),
-    _PixelfedServer(domain: 'pixey.org'),
-    _PixelfedServer(domain: 'pixels.infosec.exchange'),
+    _PixelfedServer(domain: 'pixelshot.it'),
+    _PixelfedServer(domain: 'pixelfed.dk'),
+    _PixelfedServer(domain: 'pixelfed.cz'),
+    _PixelfedServer(domain: 'pixelfed.ch'),
+    _PixelfedServer(domain: 'pixelfed.ie'),
+    _PixelfedServer(domain: 'pixelfed.si'),
+    _PixelfedServer(domain: 'pixelfed.scot'),
+    _PixelfedServer(domain: 'pixelfed.eus'),
+    _PixelfedServer(domain: 'pixl.fi'),
+    _PixelfedServer(domain: 'pixl.pt'),
+    _PixelfedServer(domain: 'pixelfed.ru'),
+    _PixelfedServer(domain: 'bolha.photos'),
+    _PixelfedServer(domain: 'fotolibre.social'),
+    // Regional — Americas
+    _PixelfedServer(domain: 'pixelfed.ca'),
+    _PixelfedServer(domain: 'pxlfd.ca'),
+    _PixelfedServer(domain: 'pixelfed.cl'),
+    // Regional — Asia-Pacific
     _PixelfedServer(domain: 'pixelfed.au'),
+    _PixelfedServer(domain: 'pixelfed.tokyo'),
+    _PixelfedServer(domain: 'sajin.life'),
+    // Thematic / community
+    _PixelfedServer(domain: 'pixelfed.art'),
+    _PixelfedServer(domain: 'pixey.org'),
+    _PixelfedServer(domain: 'spicy.social'),
+    _PixelfedServer(domain: 'pet.tax'),
+    _PixelfedServer(domain: 'crafty.social'),
+    _PixelfedServer(domain: 'instapix.org'),
+    _PixelfedServer(domain: 'pixelfed.global'),
+    _PixelfedServer(domain: 'nicagram.com'),
   ];
 
   /// Servers filtered: hide errors, hide closed registrations, apply search + size filter
