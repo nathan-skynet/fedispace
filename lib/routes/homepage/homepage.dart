@@ -68,7 +68,7 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
               width: 140,
               height: 140,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(32),
+                shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
                     color: const Color(0xFF00F3FF).withValues(alpha: 0.25),
@@ -81,8 +81,12 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
                     spreadRadius: 2,
                   ),
                 ],
-                image: const DecorationImage(
-                  image: AssetImage("assets/icon/app_icon.png"),
+              ),
+              child: ClipOval(
+                child: Image.asset(
+                  "assets/icon/app_icon.png",
+                  width: 140,
+                  height: 140,
                   fit: BoxFit.cover,
                 ),
               )),
