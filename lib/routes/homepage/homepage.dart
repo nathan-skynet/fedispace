@@ -4,6 +4,7 @@ import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/core/unifiedpush.dart';
 import 'package:fedispace/models/account.dart';
 import 'package:fedispace/routes/homepage/homepage2.dart';
+import 'package:fedispace/widgets/animated_background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -52,17 +53,10 @@ class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
         body: SingleChildScrollView(
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       child: Stack(children: [
-        Container(
+        SizedBox(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            image: const DecorationImage(
-              image: NetworkImage("https://img.freepik.com/free-vector/dark-hexagonal-background-with-gradient-color_79603-1409.jpg"), // Hex grid pattern
-              fit: BoxFit.cover,
-              opacity: 0.2, // Subtle background texture
-            ),
-          ),
+          child: const AnimatedPremiumBackground(),
         ),
         Login(
           apiService: widget.apiService,
