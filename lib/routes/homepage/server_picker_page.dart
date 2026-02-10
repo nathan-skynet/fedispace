@@ -28,10 +28,15 @@ class _PixelfedServer {
   _PixelfedServer({required this.domain});
 }
 
+enum _ServerFilter { all, popular, small }
+
 class _ServerPickerPageState extends State<ServerPickerPage>
     with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnim;
+  final TextEditingController _searchController = TextEditingController();
+  _ServerFilter _activeFilter = _ServerFilter.all;
+  String _searchQuery = '';
 
   final List<_PixelfedServer> _servers = [
     _PixelfedServer(domain: 'pixelfed.social'),
@@ -45,6 +50,35 @@ class _ServerPickerPageState extends State<ServerPickerPage>
     _PixelfedServer(domain: 'pixels.infosec.exchange'),
     _PixelfedServer(domain: 'pixelfed.au'),
   ];
+
+  /// Servers filtered: hide errors, hide closed registrations, apply search + size filter
+  List<_PixelfedServer> get _filteredServers {
+    return _servers.where((s) {
+      // Hide errored and closed-registration servers
+      if (s.error) return false;
+      if (s.loaded && !s.registrationsOpen) return false;
+
+      // Search filter
+      if (_searchQuery.isNotEmpty) {
+        final q = _searchQuery.toLowerCase();
+        final matchDomain = s.domain.toLowerCase().contains(q);
+        final matchTitle = (s.title ?? '').toLowerCase().contains(q);
+        final matchDesc = (s.description ?? '').toLowerCase().contains(q);
+        if (!matchDomain && !matchTitle && !matchDesc) return false;
+      }
+
+      // Size filter
+      if (_activeFilter == _ServerFilter.popular) {
+        if (!s.loaded) return false;
+        return (s.userCount ?? 0) >= 1000;
+      } else if (_activeFilter == _ServerFilter.small) {
+        if (!s.loaded) return false;
+        return (s.userCount ?? 0) < 1000;
+      }
+
+      return true;
+    }).toList();
+  }
 
   @override
   void initState() {
@@ -61,6 +95,7 @@ class _ServerPickerPageState extends State<ServerPickerPage>
   @override
   void dispose() {
     _fadeController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -180,29 +215,134 @@ class _ServerPickerPageState extends State<ServerPickerPage>
               ),
             ),
 
-            const SliverToBoxAdapter(child: SizedBox(height: 16)),
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
 
-            // ── Server list ──
-            SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final server = _servers[index];
-                    if (server.error) return const SizedBox.shrink();
-                    return _ServerCard(
-                      server: server,
-                      accentColor: accentColor,
-                      onTap: () => _openRegistration(server.domain),
-                      formatCount: _formatCount,
-                      l: l,
-                      index: index,
-                    );
-                  },
-                  childCount: _servers.length,
+            // ── Search bar ──
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    color: Colors.white.withValues(alpha: 0.06),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      width: 0.5,
+                    ),
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    onChanged: (v) => setState(() => _searchQuery = v),
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      hintText: l.serverPickerSearch,
+                      hintStyle: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        fontSize: 14,
+                      ),
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.only(left: 12, right: 8),
+                        child: Icon(
+                          Icons.search_rounded,
+                          color: Colors.white.withValues(alpha: 0.3),
+                          size: 20,
+                        ),
+                      ),
+                      prefixIconConstraints:
+                          const BoxConstraints(minWidth: 0, minHeight: 0),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: Icon(Icons.close_rounded,
+                                  size: 18,
+                                  color:
+                                      Colors.white.withValues(alpha: 0.4)),
+                              onPressed: () => setState(() {
+                                _searchController.clear();
+                                _searchQuery = '';
+                              }),
+                            )
+                          : null,
+                    ),
+                  ),
                 ),
               ),
             ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
+            // ── Filter chips ──
+            SliverToBoxAdapter(
+              child: SizedBox(
+                height: 40,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  children: [
+                    _buildFilterChip(l.serverPickerFilterAll,
+                        _ServerFilter.all, accentColor),
+                    const SizedBox(width: 8),
+                    _buildFilterChip(l.serverPickerFilterPopular,
+                        _ServerFilter.popular, accentColor),
+                    const SizedBox(width: 8),
+                    _buildFilterChip(l.serverPickerFilterSmall,
+                        _ServerFilter.small, accentColor),
+                  ],
+                ),
+              ),
+            ),
+
+            const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
+            // ── Server list (filtered) ──
+            Builder(builder: (context) {
+              final filtered = _filteredServers;
+              if (filtered.isEmpty && _servers.every((s) => s.loaded || s.error)) {
+                return SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 40),
+                    child: Column(
+                      children: [
+                        Icon(Icons.search_off_rounded,
+                            size: 48,
+                            color: Colors.white.withValues(alpha: 0.2)),
+                        const SizedBox(height: 16),
+                        Text(
+                          l.serverPickerNoResults,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.white.withValues(alpha: 0.4),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              return SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final server = filtered[index];
+                      return _ServerCard(
+                        server: server,
+                        accentColor: accentColor,
+                        onTap: () => _openRegistration(server.domain),
+                        formatCount: _formatCount,
+                        l: l,
+                        index: index,
+                      );
+                    },
+                    childCount: filtered.length,
+                  ),
+                ),
+              );
+            }),
 
             const SliverToBoxAdapter(child: SizedBox(height: 40)),
           ],
@@ -210,11 +350,41 @@ class _ServerPickerPageState extends State<ServerPickerPage>
       ),
     );
   }
-}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Server Card Widget
-// ─────────────────────────────────────────────────────────────────────────────
+  Widget _buildFilterChip(
+      String label, _ServerFilter filter, Color accentColor) {
+    final isActive = _activeFilter == filter;
+    return GestureDetector(
+      onTap: () => setState(() => _activeFilter = filter),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: isActive
+              ? accentColor.withValues(alpha: 0.15)
+              : Colors.white.withValues(alpha: 0.06),
+          border: Border.all(
+            color: isActive
+                ? accentColor.withValues(alpha: 0.4)
+                : Colors.white.withValues(alpha: 0.08),
+            width: 0.5,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: isActive
+                ? accentColor
+                : Colors.white.withValues(alpha: 0.5),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _ServerCard extends StatefulWidget {
   final _PixelfedServer server;

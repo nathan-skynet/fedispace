@@ -219,6 +219,11 @@ class AppLocalizations {
   String get serverPickerPosts => _t('serverPickerPosts');
   String get serverPickerOpenReg => _t('serverPickerOpenReg');
   String get serverPickerClosedReg => _t('serverPickerClosedReg');
+  String get serverPickerSearch => _t('serverPickerSearch');
+  String get serverPickerFilterAll => _t('serverPickerFilterAll');
+  String get serverPickerFilterPopular => _t('serverPickerFilterPopular');
+  String get serverPickerFilterSmall => _t('serverPickerFilterSmall');
+  String get serverPickerNoResults => _t('serverPickerNoResults');
 
   static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
   

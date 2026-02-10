@@ -91,6 +91,11 @@ const _en = <String, String>{
   "serverPickerPosts": "posts",
   "serverPickerOpenReg": "Open",
   "serverPickerClosedReg": "Closed",
+  "serverPickerSearch": "Search servers...",
+  "serverPickerFilterAll": "All",
+  "serverPickerFilterPopular": "Popular",
+  "serverPickerFilterSmall": "Small",
+  "serverPickerNoResults": "No servers found",
 };
 
 const _fr = <String, String>{
@@ -178,6 +183,11 @@ const _fr = <String, String>{
   "serverPickerPosts": "publications",
   "serverPickerOpenReg": "Ouvert",
   "serverPickerClosedReg": "Fermé",
+  "serverPickerSearch": "Rechercher des serveurs...",
+  "serverPickerFilterAll": "Tous",
+  "serverPickerFilterPopular": "Populaires",
+  "serverPickerFilterSmall": "Petits",
+  "serverPickerNoResults": "Aucun serveur trouvé",
 };
 
 const _es = <String, String>{
@@ -265,6 +275,11 @@ const _es = <String, String>{
   "serverPickerPosts": "publicaciones",
   "serverPickerOpenReg": "Abierto",
   "serverPickerClosedReg": "Cerrado",
+  "serverPickerSearch": "Buscar servidores...",
+  "serverPickerFilterAll": "Todos",
+  "serverPickerFilterPopular": "Populares",
+  "serverPickerFilterSmall": "Pequeños",
+  "serverPickerNoResults": "No se encontraron servidores",
 };
 
 const _de = <String, String>{
@@ -352,6 +367,11 @@ const _de = <String, String>{
   "serverPickerPosts": "Beiträge",
   "serverPickerOpenReg": "Offen",
   "serverPickerClosedReg": "Geschlossen",
+  "serverPickerSearch": "Server suchen...",
+  "serverPickerFilterAll": "Alle",
+  "serverPickerFilterPopular": "Beliebt",
+  "serverPickerFilterSmall": "Klein",
+  "serverPickerNoResults": "Keine Server gefunden",
 };
 
 const _it = <String, String>{
@@ -439,6 +459,11 @@ const _it = <String, String>{
   "serverPickerPosts": "post",
   "serverPickerOpenReg": "Aperto",
   "serverPickerClosedReg": "Chiuso",
+  "serverPickerSearch": "Cerca server...",
+  "serverPickerFilterAll": "Tutti",
+  "serverPickerFilterPopular": "Popolari",
+  "serverPickerFilterSmall": "Piccoli",
+  "serverPickerNoResults": "Nessun server trovato",
 };
 
 const _pt = <String, String>{
@@ -526,6 +551,11 @@ const _pt = <String, String>{
   "serverPickerPosts": "publicações",
   "serverPickerOpenReg": "Aberto",
   "serverPickerClosedReg": "Fechado",
+  "serverPickerSearch": "Pesquisar servidores...",
+  "serverPickerFilterAll": "Todos",
+  "serverPickerFilterPopular": "Populares",
+  "serverPickerFilterSmall": "Pequenos",
+  "serverPickerNoResults": "Nenhum servidor encontrado",
 };
 
 const _nl = <String, String>{
@@ -613,6 +643,11 @@ const _nl = <String, String>{
   "serverPickerPosts": "berichten",
   "serverPickerOpenReg": "Open",
   "serverPickerClosedReg": "Gesloten",
+  "serverPickerSearch": "Servers zoeken...",
+  "serverPickerFilterAll": "Alle",
+  "serverPickerFilterPopular": "Populair",
+  "serverPickerFilterSmall": "Klein",
+  "serverPickerNoResults": "Geen servers gevonden",
 };
 
 const _ru = <String, String>{
@@ -700,6 +735,11 @@ const _ru = <String, String>{
   "serverPickerPosts": "публикаций",
   "serverPickerOpenReg": "Открыто",
   "serverPickerClosedReg": "Закрыто",
+  "serverPickerSearch": "Поиск серверов...",
+  "serverPickerFilterAll": "Все",
+  "serverPickerFilterPopular": "Популярные",
+  "serverPickerFilterSmall": "Маленькие",
+  "serverPickerNoResults": "Серверы не найдены",
 };
 
 const _zh = <String, String>{
@@ -787,6 +827,11 @@ const _zh = <String, String>{
   "serverPickerPosts": "帖子",
   "serverPickerOpenReg": "开放",
   "serverPickerClosedReg": "关闭",
+  "serverPickerSearch": "搜索服务器...",
+  "serverPickerFilterAll": "全部",
+  "serverPickerFilterPopular": "热门",
+  "serverPickerFilterSmall": "小型",
+  "serverPickerNoResults": "未找到服务器",
 };
 
 const _ja = <String, String>{
@@ -874,6 +919,11 @@ const _ja = <String, String>{
   "serverPickerPosts": "投稿",
   "serverPickerOpenReg": "オープン",
   "serverPickerClosedReg": "クローズ",
+  "serverPickerSearch": "サーバーを検索...",
+  "serverPickerFilterAll": "すべて",
+  "serverPickerFilterPopular": "人気",
+  "serverPickerFilterSmall": "小規模",
+  "serverPickerNoResults": "サーバーが見つかりません",
 };
 
 const _ko = <String, String>{
@@ -961,6 +1011,11 @@ const _ko = <String, String>{
   "serverPickerPosts": "게시물",
   "serverPickerOpenReg": "오픈",
   "serverPickerClosedReg": "닫힘",
+  "serverPickerSearch": "서버 검색...",
+  "serverPickerFilterAll": "모두",
+  "serverPickerFilterPopular": "인기",
+  "serverPickerFilterSmall": "소규모",
+  "serverPickerNoResults": "서버를 찾을 수 없습니다",
 };
 
 const _ar = <String, String>{
@@ -1048,6 +1103,11 @@ const _ar = <String, String>{
   "serverPickerPosts": "منشورات",
   "serverPickerOpenReg": "مفتوح",
   "serverPickerClosedReg": "مغلق",
+  "serverPickerSearch": "البحث عن خوادم...",
+  "serverPickerFilterAll": "الكل",
+  "serverPickerFilterPopular": "شائع",
+  "serverPickerFilterSmall": "صغير",
+  "serverPickerNoResults": "لم يتم العثور على خوادم",
 };
 
 const _hi = <String, String>{
@@ -1135,6 +1195,11 @@ const _hi = <String, String>{
   "serverPickerPosts": "पोस्ट",
   "serverPickerOpenReg": "खुला",
   "serverPickerClosedReg": "बंद",
+  "serverPickerSearch": "सर्वर खोजें...",
+  "serverPickerFilterAll": "सभी",
+  "serverPickerFilterPopular": "लोकप्रिय",
+  "serverPickerFilterSmall": "छोटे",
+  "serverPickerNoResults": "कोई सर्वर नहीं मिला",
 };
 
 const _tr = <String, String>{
@@ -1222,6 +1287,11 @@ const _tr = <String, String>{
   "serverPickerPosts": "gönderi",
   "serverPickerOpenReg": "Açık",
   "serverPickerClosedReg": "Kapalı",
+  "serverPickerSearch": "Sunucu ara...",
+  "serverPickerFilterAll": "Tümü",
+  "serverPickerFilterPopular": "Popüler",
+  "serverPickerFilterSmall": "Küçük",
+  "serverPickerNoResults": "Sunucu bulunamadı",
 };
 
 const _pl = <String, String>{
@@ -1309,6 +1379,11 @@ const _pl = <String, String>{
   "serverPickerPosts": "postów",
   "serverPickerOpenReg": "Otwarte",
   "serverPickerClosedReg": "Zamknięte",
+  "serverPickerSearch": "Szukaj serwerów...",
+  "serverPickerFilterAll": "Wszystkie",
+  "serverPickerFilterPopular": "Popularne",
+  "serverPickerFilterSmall": "Małe",
+  "serverPickerNoResults": "Nie znaleziono serwerów",
 };
 
 const _uk = <String, String>{
@@ -1396,4 +1471,9 @@ const _uk = <String, String>{
   "serverPickerPosts": "публікацій",
   "serverPickerOpenReg": "Відкрито",
   "serverPickerClosedReg": "Закрито",
+  "serverPickerSearch": "Пошук серверів...",
+  "serverPickerFilterAll": "Усі",
+  "serverPickerFilterPopular": "Популярні",
+  "serverPickerFilterSmall": "Маленькі",
+  "serverPickerNoResults": "Серверів не знайдено",
 };
