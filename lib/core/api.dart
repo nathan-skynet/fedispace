@@ -394,6 +394,8 @@ class ApiService {
     String apiUrl;
     if (timeLine == 'home') {
       apiUrl = '${instanceUrl!}/api/v1/timelines/home?limit=20';
+    } else if (timeLine == 'local') {
+      apiUrl = '${instanceUrl!}/api/v1/timelines/public?local=true&limit=20';
     } else {
       apiUrl = '${instanceUrl!}/api/v1/timelines/public?limit=20';
     }
