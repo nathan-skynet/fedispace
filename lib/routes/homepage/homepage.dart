@@ -4,7 +4,6 @@ import 'package:fedispace/l10n/app_localizations.dart';
 import 'package:fedispace/core/unifiedpush.dart';
 import 'package:fedispace/models/account.dart';
 import 'package:fedispace/routes/homepage/homepage2.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -23,12 +22,27 @@ class HomeScreen extends StatefulWidget {
 }
 
 /// The [_LoginState] wraps the logic and state for the [Login] screen.
-class _HomeScreen extends State<HomeScreen> {
+class _HomeScreen extends State<HomeScreen> with TickerProviderStateMixin {
   Account? account;
+  late AnimationController _heartController;
+  late Animation<double> _heartScale;
 
   @override
   void initState() {
     super.initState();
+    _heartController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 800),
+    )..repeat(reverse: true);
+    _heartScale = Tween<double>(begin: 1.0, end: 1.25).animate(
+      CurvedAnimation(parent: _heartController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _heartController.dispose();
+    super.dispose();
   }
 
   @override
@@ -63,12 +77,12 @@ class _HomeScreen extends State<HomeScreen> {
                 borderRadius: BorderRadius.circular(32),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF00F3FF).withOpacity(0.25),
+                    color: const Color(0xFF00F3FF).withValues(alpha: 0.25),
                     blurRadius: 40,
                     spreadRadius: 2,
                   ),
                   BoxShadow(
-                    color: const Color(0xFFFF2D78).withOpacity(0.15),
+                    color: const Color(0xFFFF2D78).withValues(alpha: 0.15),
                     blurRadius: 40,
                     spreadRadius: 2,
                   ),
@@ -95,30 +109,65 @@ class _HomeScreen extends State<HomeScreen> {
                       color: Colors.white70,
                   ),
                 ),
-                Text.rich(
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(color: Colors.white70),
-                  TextSpan(children: [
-                    TextSpan(text: S.of(context).loginMadeWith),
-                    TextSpan(
-                        style: const TextStyle(
-                            color: Colors.blue,
-                            decoration: TextDecoration.underline),
-                        text: "Nathan Skynet",
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () async {
-                            Uri url = Uri.parse("https://me.echelon4.space");
-                            var urlLaunchable = await canLaunchUrl(
-                                url); //canLaunch is from url_launcher package
-                            if (urlLaunchable) {
-                              await launchUrl(
-                                  url); //launch is from url_launcher package to launch URL
-                            } else {
-                              debugPrint("URL can't be launched.");
-                            }
-                          }),
-                    TextSpan(text: S.of(context).loginAndCommunity),
-                  ]),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      S.of(context).loginMadeWith,
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                    // Animated pulsing heart with glow
+                    ScaleTransition(
+                      scale: _heartScale,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFFF2D55).withValues(alpha: 0.6),
+                              blurRadius: 12,
+                              spreadRadius: 2,
+                            ),
+                            BoxShadow(
+                              color: const Color(0xFF00F3FF).withValues(alpha: 0.2),
+                              blurRadius: 20,
+                              spreadRadius: 1,
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.favorite_rounded,
+                          color: Color(0xFFFF2D55),
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    GestureDetector(
+                      onTap: () async {
+                        Uri url = Uri.parse("https://me.echelon4.space");
+                        var urlLaunchable = await canLaunchUrl(url);
+                        if (urlLaunchable) {
+                          await launchUrl(url);
+                        } else {
+                          debugPrint("URL can't be launched.");
+                        }
+                      },
+                      child: const Text(
+                        "Sk7n4k3d",
+                        style: TextStyle(
+                          color: Color(0xFF00F3FF),
+                          decoration: TextDecoration.underline,
+                          decorationColor: Color(0xFF00F3FF),
+                        ),
+                      ),
+                    ),
+                    Text(
+                      S.of(context).loginAndCommunity,
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                  ],
                 ),
                 Container(
                   height: 10,
