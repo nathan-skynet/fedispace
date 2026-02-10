@@ -301,13 +301,14 @@ class _SecondaryButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
+          constraints: const BoxConstraints(minHeight: 52),
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: isDark
-                  ? Colors.white.withOpacity(0.15)
-                  : Colors.black.withOpacity(0.1),
+                  ? Colors.white.withValues(alpha: 0.15)
+                  : Colors.black.withValues(alpha: 0.1),
             ),
           ),
           child: Center(
@@ -316,8 +317,8 @@ class _SecondaryButton extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: isDark
-                    ? Colors.white.withOpacity(0.7)
-                    : Colors.black.withOpacity(0.6),
+                    ? Colors.white.withValues(alpha: 0.7)
+                    : Colors.black.withValues(alpha: 0.6),
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),
